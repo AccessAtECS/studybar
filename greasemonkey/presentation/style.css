@@ -19,13 +19,148 @@ body {
 	padding-right:5px;
 	margin-left: auto;
 	margin-right: auto;
-	margin-bottom:40px;
+	margin-bottom:45px;
 }
 
-#closeButton{
+#sbar .button {
+	background-image: url(images/button_background.png);
+	height:28px;
+	width:28px;
+	margin-top: 5px;
+	float:left;
+	line-height: 14px;
+	text-align:center;
+	margin-left: 5px;
+}
+
+#sbar .button a:hover img {
+	opacity:1; 
+	filter:alpha(opacity=100);
+}
+
+#sbar .button img {
+	margin-top:6px;
+	opacity:0.4;
+	filter:alpha(opacity=40);
+}
+
+#sbar .button .selected img{
+	opacity:1;
+	filter:alpha(opacity=100);
+}
+
+#sbar .closeButton{
 	float:right;
-	width:32px;
-	height:32px;
-	margin-right:10px;
-	margin-top:4px;
+	margin-left:0px;
+	margin-right: 10px;
+}
+
+#spellcheckresults { position: absolute; background: #fff; margin: 0; border: 1px solid #000; padding: 5px; }
+	#spellcheckresults dl { margin: 0; padding: 0; }
+		#spellcheckresults dl dt { float: left; clear: left; margin: 3px 0; padding: 0; font-weight: bold; }
+		#spellcheckresults dl dd { float: left; margin: 3px 10px; padding: 0; cursor: pointer; color: green; }
+		#spellcheckresults dl dd.ignore { color: red; font-style: italic; }
+		
+.tipsy { padding: 5px; font-size: 10px; opacity: 0.8; filter: alpha(opacity=80); background-repeat: no-repeat; }
+  .tipsy-inner { padding: 4px 5px; background-color: black; color: white; max-width: 200px; text-align: center; }
+  .tipsy-north { background-image: url(images/tipsy-north.gif); background-position: top center; }
+  .tipsy-south { background-image: url(images/tipsy-south.gif); background-position: bottom center; }
+  .tipsy-east { background-image: url(images/tipsy-east.gif); background-position: right center; }
+  .tipsy-west { background-image: url(images/tipsy-west.gif); background-position: left center; }
+
+
+#facebox .b {
+  background:url(images/b.png);
+}
+
+#facebox .tl {
+  background:url(images/tl.png);
+}
+
+#facebox .tr {
+  background:url(images/tr.png);
+}
+
+#facebox .bl {
+  background:url(images/bl.png);
+}
+
+#facebox .br {
+  background:url(images/br.png);
+}
+
+#facebox {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  text-align: left;
+}
+
+#facebox .popup {
+  position: relative;
+}
+
+#facebox table {
+  border-collapse: collapse;
+}
+
+#facebox td {
+  border-bottom: 0;
+  padding: 0;
+}
+
+#facebox .body {
+  padding: 10px;
+  background: #fff;
+  width: 370px;
+}
+
+#facebox .loading {
+  text-align: center;
+}
+
+#facebox .image {
+  text-align: center;
+}
+
+#facebox img {
+  border: 0;
+  margin: 0;
+}
+
+#facebox .footer {
+  border-top: 1px solid #DDDDDD;
+  padding-top: 5px;
+  margin-top: 10px;
+  text-align: right;
+}
+
+#facebox .tl, #facebox .tr, #facebox .bl, #facebox .br {
+  height: 10px;
+  width: 10px;
+  overflow: hidden;
+  padding: 0;
+}
+
+#facebox_overlay {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  height:100%;
+  width:100%;
+}
+
+.facebox_hide {
+  z-index:-100;
+}
+
+.facebox_overlayBG {
+  background-color: #000;
+  z-index: 99;
+}
+
+* html #facebox_overlay { /* ie6 hack */
+  position: absolute;
+  height: expression(document.body.scrollHeight > document.body.offsetHeight ? document.body.scrollHeight : document.body.offsetHeight + 'px');
 }
