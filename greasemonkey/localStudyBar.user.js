@@ -24,11 +24,29 @@
 // @description   Accessibility toolbar
 // @include       *
 // @require       http://code.jquery.com/jquery-latest.js
+// @require       http://access.ecs.soton.ac.uk/seb/StudyBar/spell/core.js
+// @require       http://access.ecs.soton.ac.uk/seb/StudyBar/jquery.tipsy.js
+// @require       http://access.ecs.soton.ac.uk/seb/StudyBar/jquery.facebox.js
+// @require       http://access.ecs.soton.ac.uk/seb/StudyBar/button.class.js
 // ==/UserScript==
 
 //window.setTimeout("helloworld()", 60);
 
-var settings = { stylesheetURL: "http://users.ecs.soton.ac.uk/scs/LSL/StudyBar/greasemonkey/presentation/style.css" };
+var settings = { 	stylesheetURL: "http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/style.css",
+					baseURL: "http://access.ecs.soton.ac.uk/seb/StudyBar/",
+					aboutBox: "<h2>About StudyBar</h2>Version 0.1.322a<br />Some information about StudyBar here." };
+var originalPageSettings = { fontsize: "" };
+
+var toolbarItems = {
+		resizeUp: { id: 'resizeUp', ico: 'font_increase.png', act: 'resizeText(0.5);', tip: 'Increase text size' },
+		resizeDown: { id: 'resizeDown', ico: 'font_decrease.png', act: 'resizeText(-0.5)', tip: 'Decrease text size' },
+		spell: { id: 'spell', ico: 'spell.png', act: 'spellCheckPage()', tip: 'Activate spellchecker' },
+		color: { id: 'color', ico: 'color_wheel.png', act: 'colorWheelMenu()', tip: 'Colour Options' },
+		TTS: { id: 'tts', ico: 'sound.png', act: 'startTTS()', tip: 'Start Text to Speech' },
+		CSS: { id: 'css', ico: 'palette.png', act: 'changeCSS()', tip: 'Change Styles' }
+	};
+var buttons = {};
+
 
 window.loadStudyBar = function(){
 	doc = document;
@@ -39,6 +57,7 @@ window.loadStudyBar = function(){
 	stylesheet.href = settings.stylesheetURL;
 	stylesheet.rel = "stylesheet";
 	stylesheet.type = "text/css";
+	stylesheet.id = "sBarCSS";
 	head.appendChild(stylesheet);
 	
 	
@@ -47,30 +66,49 @@ window.loadStudyBar = function(){
 	// Insert it as the first node in the body node.
 	doc.body.insertBefore(bar, doc.body.firstChild);
 	
-	// Set the ID and the content of the bar.
+	// Set the ID of the toolbar.
 	bar.id = "sbar";
-	bar.innerHTML = '<a href="#" id="resizeUp">Up</a> ~ <a href="#" id="resizeDown">Down</a>';
-	doc.getElementById('resizeUp').addEventListener('click', function() {resizeText(1);} , false);
-	doc.getElementById('resizeDown').addEventListener('click', function() {resizeText(-1);} , false);
+	
+	// Add logo to studybar.
+	$("<a href=\"#\" id=\"sbarlogo\"><img src=\"" + settings.baseURL +  "presentation/images/logo.png\" align=\"left\" border=\"0\" style=\"margin-top:6px\" /></a>").appendTo('#sbar');
+	
+	// Add items to the toolbar.
 	populateBar();
+	
+	// Save current page settings, so we can reset them later if we need to!
+	originalPageSettings.fontsize = document.body.style.fontSize;
+	
+	// Set studybar to load next time we load a page.
+	GM_setValue('autoload', true);
+
+	jQuery('a[rel*=facebox]').facebox();
+	
+	$("#sbarlogo").bind("click", function(e){ jQuery.facebox( settings.aboutBox ); });
 }
 
 
-// Populate the bar with the different toolbar items.
+// Populate the bar with the different toolbar items defined in object at start.
 window.populateBar = function(){
-	alert('populating bar');
+	for ( var i in toolbarItems ){
+		var item = returnNewButton( toolbarItems[i].id, toolbarItems[i].ico, toolbarItems[i].act, toolbarItems[i].tip, '' );
+	}
+	
+	returnNewButton( 'closeSBar', 'cross.png', 'unloadStudyBar()', 'Exit StudyBar', 'closeButton' );	
 }
 
-window.createButton = function(id, ico, act){
+window.hoverButton = function(id){
 	
 }
 
 
 // Functions called from within the bar below
-window.changeColour = function(){
+window.randomColour = function(){
 	document.getElementById('sbar').style.backgroundColor = '#'+Math.floor(Math.random()*16777215).toString(16);
 }
 
+window.colorWheelMenu = function(){
+	randomColour();
+}
 
 window.resizeText = function(multiplier) {
   if (document.body.style.fontSize == "") {
@@ -81,6 +119,39 @@ window.resizeText = function(multiplier) {
   $('div').css('font-size', newVal);
 }
 
+window.spellCheckPage = function(){
+	console.log("spellchecker activated");
+	$("textarea").spellcheck();
+	$('input[type=text]').spellcheck();
+}
+
+window.unloadStudyBar = function(){
+	
+	// Closing studybar.
+	window.setTimeout(GM_setValue, 0, "autoload", false);
+	
+	$('#sbar').remove();
+	$('#sBarCSS').remove();
+	$('.tipsy').remove();
+	
+	document.body.style.fontSize = originalPageSettings.fontsize;
+}
+
+window.saveSettings = function(){
+	
+	
+}
+
 
 // Register the greasemonkey menu items.
 GM_registerMenuCommand("Local StudyBar", function(){ loadStudyBar() });
+
+
+// If the user had studybar open, reopen it again.
+var autoLoadValue = GM_getValue('autoload', false);
+
+if( autoLoadValue == true ) {
+	$(document).ready(function(){
+		loadStudyBar();
+	});
+}
