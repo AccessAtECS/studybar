@@ -45,7 +45,6 @@ $.SpellChecker = function(element, options) {
 		ignorecaps: 1,
 		ignoredigits: 1
 	}, options);
-	//GM_log("remoting");
 	this.bindEvents();
 };
 
@@ -60,20 +59,76 @@ $.SpellChecker.prototype = {
 			} else
 				self.checkSpelling(); 
 		});
+		// set recievedData here?
 	},
 	
 	checkSpelling: function() {
 		var prevText = this.text, text = this.$element.val(), self = this;
 		if ( prevText === text ) return;
 		this.text = this.$element.val();
-		// This is the jQuery function, however we cant use this as we are using this locally...
-		$.get(this.options.url, $.extend({ text: this.text }, this.options), function(r) { self.parseResults(r); });
-		// So lets use the Greasemonkey version.
-		//GM_xmlhttpRequest({ method: "GET", url: "http://access.ecs.soton.ac.uk/seb/StudyBar/spell/spellcheck.php?lang=en&ignoredigits=1&ignorecaps=1", data: this.text, onload: self.parseResults });
+		
+		
+		if(window.XHRMethod == "GM-XHR"){
+			window.recievedData = "";
+			GM_xmlhttpRequest({ method: "GET",
+				url: "http://access.ecs.soton.ac.uk/seb/StudyBar/spell/spellcheck.php?lang=en&ignoredigits=1&ignorecaps=1&text=" + encodeURIComponent(this.text), 
+				onload: self.writeData,
+				onreadystatechange: self.checkStatus });
+			// This is to check that we've recieved the data. GM times out otherwise, so we have to use a timer to keep it alive.
+			this.ajaxInterval = setInterval(function(){
+				self.checkDataResult();
+			}, 100);
+		} else {
+			window.attachJS( settings.baseURL + 'xmlhttp/remote.php?rt=spell&id=' + Math.floor(Math.random() * 5001) + '&lang=en&ignoredigits=1&ignorecaps=1&text=' + encodeURIComponent(this.text), 'CS-XHR' );
+			//alert("XS-XHR/GM-XHR not supported. Switching to " + XHRMethod);
+			this.ajaxInterval = setInterval(function(){
+				self.checkCSXHRResponse();
+			}, 100);
+		}
+    
+	},
+	
+	writeData: function(response){
+		// Write the data out to a variable, as response is going to disapear!
+		self.recievedData = response.responseText;
+		//console.log("writing data:" + self.recievedData);
+	},
+	
+	checkStatus: function(response){
+		//alert(response.readyState);
+	},
+	
+	checkDataResult: function(){
+		// Do we have data yet? If so, lets clear the interval and parse the results!
+		
+		if( window.recievedData != "" ){
+			clearInterval( this.ajaxInterval );
+			//console.log("Recieved: " + self.recievedData);
+			
+			this.parseResults( window.recievedData );
+			
+			// Reset the storage variable for the xmlhttprequest'd data
+			window.recievedData = "";
+		}
+	},
+	
+	checkCSXHRResponse: function(){
+		// Do we have data yet? If so, lets clear the interval and parse the results!
+		if( (typeof CSresponseObject) != "undefined" ){
+			clearInterval( this.ajaxInterval );
+			//console.log("Recieved: " + self.recievedData);
+			
+			// Copy the response object to a local object.
+			var RO = CSresponseObject;
+			
+			// Remove the response JS.
+			$('#CS-XHR').remove();
+
+			this.parseResults( RO.data );
+		}		
 	},
 	
 	parseResults: function(results) {
-		console.dir(results);
 		var self = this;
 		this.results = [];
 		$(results).find('c').each(function() {
@@ -87,6 +142,7 @@ $.SpellChecker.prototype = {
 		});
 		this.displayResults();
 	},
+
 	
 	displayResults: function() {
 		$('#spellcheckresults').remove();

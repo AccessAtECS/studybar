@@ -4,21 +4,6 @@
 	<head>
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
 		<title>test</title>
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js" type="text/javascript" charset="utf-8"></script>
-		<script src="jquery.spellcheck.js" type="text/javascript" charset="utf-8"></script>
-		<script type="text/javascript" charset="utf-8">
-			jQuery(document).ready(function($) {
-				//$.get("test.php", { lang: 'en', text: "testng spelcheckr testng"}, function(r) { console.log(r); });
-				$('#test1').spellcheck({ events: null });
-				$('#test2, #test3').spellcheck();
-				$('#test4').spellcheck({ events: 'keyup' });
-				$('a.checkspelling').bind('click', function(event) {
-					$(this.hash).checkspelling();
-					this.blur();
-					return false;
-				});
-			});
-		</script>
 		<style type="text/css" media="screen">
 			body { font-size: small; font-family:"lucida Grande", "lucida sans unicode", "myriad pro", arial, helvetica, sans-serif; }
 			input, textarea { width: 250px; }
@@ -37,7 +22,7 @@
 		<form action="#" method="get">
 			<fieldset>	
 				<legend>Testing Spellchecker</legend>
-					<label for="test1">Test: </label><input type="text" name="test1" id="test1" value="Testng ths spelcheckr out."><a href="#test1" class="checkspelling"><img src="spellcheck.png"></a><br>
+					<label for="test1">Test: </label><input type="text" name="test1" id="test1" value="Testng ths spelcheckr out."><br>
 					<label for="test2">Test: </label><input type="text" name="test2" id="test2"><br>
 					<label for="test3">Test: </label><input type="password" name="test3" id="test3"><br>
 					<label for="test4">Test: </label><br>
