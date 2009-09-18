@@ -44,19 +44,19 @@ var settings = { 	stylesheetURL: "presentation/style.css",
 
 
 var toolbarItems = {
-		resizeUp: { id: 'resizeUp', ico: 'font_increase.png', act: 'resizeText(0.5);', tip: 'Increase text size' },
-		resizeDown: { id: 'resizeDown', ico: 'font_decrease.png', act: 'resizeText(-0.5)', tip: 'Decrease text size' },
-		fontSettings: { id: 'fontSettings', ico: 'font.png', act: 'something()', tip: 'Font settings' },
-		spell: { id: 'spell', ico: 'spell.png', act: 'spellCheckPage()', tip: 'Start / Stop spellchecker' },
-		TTS: { id: 'tts', ico: 'sound.png', act: 'ttsOptions()', tip: 'Text to Speech options',
+		resizeUp: { id: 'resizeUp', ico: 'font_increase.png', act: 'resizeText(0.5);', tip: 'Increase text size', clickEnabled: true },
+		resizeDown: { id: 'resizeDown', ico: 'font_decrease.png', act: 'resizeText(-0.5)', tip: 'Decrease text size', clickEnabled: true },
+		fontSettings: { id: 'fontSettings', ico: 'font.png', act: 'something()', tip: 'Font settings', clickEnabled: true },
+		spell: { id: 'spell', ico: 'spell-off.png', act: 'spellCheckPage()', tip: 'Start / Stop spellchecker', clickEnabled: true },
+		TTS: { id: 'tts', ico: 'sound.png', act: 'ttsOptions()', tip: 'Text to Speech options', clickEnabled: true,
 				dialogs: {
 					options: "<h2>Text to Speech options</h2> <div class=\"sbarDialogButton\"> <a id=\"sbStartTTS\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Get Text-To-Speech for this page</a></div>",
 					starting: "<h2>Text To Speech</h2> <center>Text to Speech conversion is taking place. <br /><img src='http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/loadingbig.gif' /><br />Time remaining: <div id='sbttstimeremaining'>calculating</div><br />Please wait... <center>"
 				}
 		},
-		references: { id: 'references', ico: 'book_link.png', act: 'something()', tip: 'References' },
-		dictionary: { id: 'dictionary', ico: 'book_open.png', act: 'something()', tip: 'Dictionary' },
-		CSS: { id: 'changecss', ico: 'palette.png', act: 'changeColours(0)', tip: 'Change Styles', 
+		references: { id: 'references', ico: 'book_link.png', act: 'something()', tip: 'References', clickEnabled: true },
+		dictionary: { id: 'dictionary', ico: 'book_open.png', act: 'getDictionaryRef()', tip: 'Dictionary', clickEnabled: true },
+		CSS: { id: 'changecss', ico: 'palette.png', act: 'changeColours(0)', tip: 'Change Styles', clickEnabled: true, 
 				dialogs: { 
 					colourDialog: "<h2>Change Colour settings</h2> <div class=\"sbarDialogButton\"> <a href=\"#\" id=\"sbColourChange\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Change StudyBar Colour</a></div> <div class=\"sbarDialogButton\"><a href=\"#\" id=\"sbChangeSiteColours\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Change Site Colours</a></div> <div class=\"sbarDialogButton\"><a href=\"#\" id=\"sbAttachCSSStyle\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Attach CSS Style</a></div>",
 					sbColourDialog: "<h2>Change StudyBar Colour</h2> <label for=\"sbbackgroundcolour\">Background Colour: </label><input type=\"text\" name=\"sbbackgroundcolour\" id=\"sbbackgroundcolour\"> <a href=\"#\" id=\"sbSetColour\"><img src=\"" + settings.baseURL + "/presentation/images/accept.png \" /> Set</a> <br /> <a href=\"#\" onclick=\"document.getElementById('sbbackgroundcolour').value = 'black';\">Black</a> <br /> <div class=\"sbarDialogButton\"><a href=\"#\" id=\"sbRandomColour\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Random</a></div> <div class=\"sbarDialogButton\"> <a href=\"#\" id=\"sbColourReset\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Reset to Default</a></div>",
@@ -64,12 +64,12 @@ var toolbarItems = {
 					sbAttachCSS: "<h2>Atatch CSS Stylesheet<h2> <div class=\"sbarDialogButton\"><a href=\"#\" id=\"sbApplyCSS-yb\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Yellow and Black</a></div>"
 				} 
 		},
-		settings: { id: 'settings', ico: 'cog.png', act: 'settingsDialog(0)', tip: 'Settings', styleClass: ' fright',
+		settings: { id: 'settings', ico: 'cog.png', act: 'settingsDialog(0)', tip: 'Settings', styleClass: ' fright', clickEnabled: true,
 		 		dialogs: {
 					landingDialog: "<h2>StudyBar Settings</h2> <div class=\"sbarDialogButton\"> <a href=\"#\" id=\"sbResetDisabled\"><img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Reset Disabled websites</a></div> <div class=\"sbarDialogButton\"> <a href=\"#\" id=\"sbresetAll\"><img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Reset Everything to defaults</a></div>"
 				}
 		},
-		help : { id: 'help', ico: 'information.png', act: 'something()', tip: 'Help', styleClass: ' fright' }
+		help : { id: 'help', ico: 'information.png', act: 'something()', tip: 'Help', styleClass: ' fright', clickEnabled: true }
 	};
 	
 var closeDialogs = { landing: "<h2>Studybar is about to exit</h2> <div class=\"sbarDialogButton\"><a href=\"#\" id=\"sbCloseThisSite\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Close for this site only</a></div> <div class=\"sbarDialogButton\"><a href=\"#\" id=\"sbCloseAllSites\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Close for all sites</a></div>" };	
@@ -257,7 +257,7 @@ window.countdownTTS = function(){
 window.playTTS = function(){
 	if(identifyBrowser() != "IE"){
 		$('#sbar').append( $("<embed src=\"" + settings.baseURL + "TTS/player/player-licensed.swf\" width=\"200\" height=\"300\" allowscriptaccess=\"always\" allowfullscreen=\"false\" flashvars=\"file=" + settings.baseURL + "TTS/cache/" + arguments[0] + ".xml&autostart=true&playlist=bottom&repeat=list\" />") );
-		$('#facebox').remove();
+		$(document).trigger('close.facebox');
 	}
 }
 
@@ -266,8 +266,9 @@ window.playTTS = function(){
 // <ToDo> Does not work first invoke for some reason. Possibly to do with xmlhttprequest change for GM?
 
 window.spellCheckPage = function(){
-	//console.log("spellchecker activated");
-	alert("Spellchecker activated");
+	console.log("spellchecker activated");
+
+	$('#sb-btnico-spell').attr('src', settings.baseURL + "presentation/images/spell.png");
 	$("textarea").spellcheck({ useXHRMethod: XHRMethod });
 	$('input[type=text]').spellcheck({ useXHRMethod: XHRMethod });
 }
@@ -305,6 +306,64 @@ window.changeColours = function(level){
 	}
 }
 
+
+window.getDictionaryRef = function(){
+	$("#sb-btnico-dictionary").attr('src', settings.baseURL + "presentation/images/loading.gif");
+	var data = eval("\"" + getSelectedText() + "\";");
+
+	if(data != ""){
+		// Firefox greasemonkey cross domain XMLHTTP.
+		if(XHRMethod == 'GM-XHR'){
+		
+		window.setTimeout(function(){
+			GM_xmlhttpRequest({ method: "GET",
+				url: "http://en.wiktionary.org/w/api.php?action=query&titles=" + encodeURI(data.toLowerCase()) + "&prop=revisions&rvlimit=1&rvprop=content&format=json", 
+				onload: getDictionaryResponse
+			});
+		}, 0)
+		
+		}
+	} else {
+		jQuery.facebox("<h2>Dictionary</h2><p>To use the dictionary select a word on the page and click the dictionary button.</p>")
+	}
+}
+
+window.getDictionaryResponse = function(response){
+	var ro = eval("(" + response.responseText + ")");
+	
+	for(var result in ro.query.pages){
+		if(result > -1){
+			var definition = eval("ro.query.pages[\"" + result + "\"].revisions[0][\"*\"];");
+			var title = eval("ro.query.pages[\"" + result + "\"].title;");
+			// Format the wikicode into something we can read in HTML.
+			console.log(definition);
+			
+			// Replace headings.
+			definition = definition.replace(/(={2,})+(.*?)(?:={2,})+/ig, function(match, g1, g2, position, input) {
+    			return "<h" + g1.length + ">" + g2 + "</h" + g1.length + ">";
+    		});
+		} else {
+			var definition = "Unknown word";
+			var title = "Unknown";
+		}
+	}
+	
+	jQuery.facebox("<h2>Dictionary Definition for \"" + title + "\"</h2><div class=\"constrainContent\">" + definition + "</div>");
+	$("#sb-btnico-dictionary").attr('src', settings.baseURL + "presentation/images/" + toolbarItems.dictionary.ico);
+}
+
+
+window.getSelectedText = function(){
+    var text = '';
+     if (window.getSelection){
+        text = window.getSelection();
+     } else if (document.getSelection){
+        text = document.getSelection();
+     } else if (document.selection){
+        text = document.selection.createRange().text;
+     }
+    return text;
+}
 
 // <Name> setColour
 // <Purpose> Sets the colour of studybar, either a random colour, or one specified by the user.
