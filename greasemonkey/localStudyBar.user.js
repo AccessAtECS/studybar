@@ -309,6 +309,7 @@ window.changeColours = function(level){
 
 window.getDictionaryRef = function(){
 	$("#sb-btnico-dictionary").attr('src', settings.baseURL + "presentation/images/loading.gif");
+	
 	var data = eval("\"" + getSelectedText() + "\";");
 
 	if(data != ""){
@@ -322,26 +323,55 @@ window.getDictionaryRef = function(){
 			});
 		}, 0)
 		
+		} else if(XHRMethod == 'CS-XHR'){
+
+			window.attachJS( settings.baseURL + 'xmlhttp/remote.php?rt=dict&id=' + Math.floor(Math.random() * 5001) + '&action=query&titles=' + encodeURI(data.toLowerCase()) + '&prop=revisions&rvlimit=1&rvprop=content&format=json', 'CS-XHR' );
+						
+			//alert("XS-XHR/GM-XHR not supported. Switching to " + XHRMethod);
+			this.dictAjaxInterval = setInterval(function(){
+				self.checkCSXHRDictResponse();
+			}, 100);
+			
 		}
 	} else {
-		jQuery.facebox("<h2>Dictionary</h2><p>To use the dictionary select a word on the page and click the dictionary button.</p>")
+		jQuery.facebox("<h2>Dictionary</h2><p>To use the dictionary select a word on the page and click the dictionary button.</p>");
+		$("#sb-btnico-dictionary").attr('src', settings.baseURL + "presentation/images/" + toolbarItems.dictionary.ico);
 	}
 }
 
+
+window.checkCSXHRDictResponse = function(){
+		// Do we have data yet? If so, lets clear the interval and parse the results!
+		if( (typeof CSresponseObject) != "undefined" ){
+			clearInterval( this.dictAjaxInterval );
+			
+			// Copy the response object to a local object.
+			var RO = CSresponseObject;
+			
+			// Remove the response JS.
+			$('#CS-XHR').remove();
+
+			window.getDictionaryResponse( RO.data );
+		}		
+	},
+
 window.getDictionaryResponse = function(response){
-	var ro = eval("(" + response.responseText + ")");
+
+	if(XHRMethod == "GM-XHR"){
+		var ro = eval("(" + response.responseText + ")");
+	} else {
+		var ro = eval("(" + response + ")");
+	}
 	
 	for(var result in ro.query.pages){
 		if(result > -1){
 			var definition = eval("ro.query.pages[\"" + result + "\"].revisions[0][\"*\"];");
 			var title = eval("ro.query.pages[\"" + result + "\"].title;");
 			// Format the wikicode into something we can read in HTML.
-			console.log(definition);
+			//console.log(definition);
 			
 			// Replace headings.
-			definition = definition.replace(/(={2,})+(.*?)(?:={2,})+/ig, function(match, g1, g2, position, input) {
-    			return "<h" + g1.length + ">" + g2 + "</h" + g1.length + ">";
-    		});
+			definition = parseDictionaryResponse(definition);
 		} else {
 			var definition = "Unknown word";
 			var title = "Unknown";
@@ -352,6 +382,40 @@ window.getDictionaryResponse = function(response){
 	$("#sb-btnico-dictionary").attr('src', settings.baseURL + "presentation/images/" + toolbarItems.dictionary.ico);
 }
 
+
+window.parseDictionaryResponse = function(input){
+	
+	// Replace headings.
+	var output = input.replace(/(={2,})+(.*?)(?:={2,})+/ig, function(match, g1, g2, position, input) {
+    	return "<h" + g1.length + ">" + g2 + "</h" + g1.length + ">";
+    });
+	
+	output = output.replace(/(\{\{(?:(.*?)\|)+(.*?)\}\})/ig, function(match, g1, g2, g3, position, input){
+		switch(g2.toLowerCase()){
+			case 'also':
+				return "See also: " + g3;
+			break;
+			
+			case 'ipa':
+				return g3;
+			break;
+			
+			case 'audio':
+				return "";
+			break;
+			
+			default:
+				return g3;	
+			break;
+		}
+	});
+	
+	output = output.replace(/(\{\{(\w{1,})\}\})/ig, "<i>$2</i>");
+	
+	output = output.replace(/(\[\[(.*?)\]\])/ig, "$2");
+	
+	return output;
+}
 
 window.getSelectedText = function(){
     var text = '';
