@@ -58,21 +58,21 @@ var toolbarItems = {
 		dictionary: { id: 'dictionary', ico: 'book_open.png', act: 'getDictionaryRef()', tip: 'Dictionary', clickEnabled: true },
 		CSS: { id: 'changecss', ico: 'palette.png', act: 'changeColours(0)', tip: 'Change Styles', clickEnabled: true, 
 				dialogs: { 
-					colourDialog: "<h2>Change Colour settings</h2> <div class=\"sbarDialogButton\"> <a href=\"#\" id=\"sbColourChange\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Change StudyBar Colour</a></div> <div class=\"sbarDialogButton\"><a href=\"#\" id=\"sbChangeSiteColours\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Change Site Colours</a></div> <div class=\"sbarDialogButton\"><a href=\"#\" id=\"sbAttachCSSStyle\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Attach CSS Style</a></div>",
-					sbColourDialog: "<h2>Change StudyBar Colour</h2> <label for=\"sbbackgroundcolour\">Background Colour: </label><input type=\"text\" name=\"sbbackgroundcolour\" id=\"sbbackgroundcolour\"> <a href=\"#\" id=\"sbSetColour\"><img src=\"" + settings.baseURL + "/presentation/images/accept.png \" /> Set</a> <br /> <a href=\"#\" onclick=\"document.getElementById('sbbackgroundcolour').value = 'black';\">Black</a> <br /> <div class=\"sbarDialogButton\"><a href=\"#\" id=\"sbRandomColour\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Random</a></div> <div class=\"sbarDialogButton\"> <a href=\"#\" id=\"sbColourReset\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Reset to Default</a></div>",
-					sbSiteColours: "<h2>Change this site's colours</h2> <label for=\"sbbackgroundcolour\">Background Colour: </label><input type=\"text\" name=\"sbpagebackgroundcolour\" id=\"sbpagebackgroundcolour\"> <div class=\"sbarDialogButton\"><a href=\"#\" id=\"applyPageColours\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Apply</a></div>",
-					sbAttachCSS: "<h2>Atatch CSS Stylesheet<h2> <div class=\"sbarDialogButton\"><a href=\"#\" id=\"sbApplyCSS-yb\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Yellow and Black</a></div>"
+					colourDialog: "<h2>Change Colour settings</h2> <div class=\"sbarDialogButton\"> <a id=\"sbColourChange\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Change StudyBar Colour</a></div> <div class=\"sbarDialogButton\"><a id=\"sbChangeSiteColours\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Change Site Colours</a></div> <div class=\"sbarDialogButton\"><a id=\"sbAttachCSSStyle\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Attach CSS Style</a></div>",
+					sbColourDialog: "<h2>Change StudyBar Colour</h2> <label for=\"sbbackgroundcolour\">Background Colour: </label><input type=\"text\" name=\"sbbackgroundcolour\" id=\"sbbackgroundcolour\"> <a id=\"sbSetColour\"><img src=\"" + settings.baseURL + "/presentation/images/accept.png \" /> Set</a> <br /> <a onclick=\"document.getElementById('sbbackgroundcolour').value = 'black';\">Black</a> <a onclick=\"document.getElementById('sbbackgroundcolour').value = 'white';\">White</a> <a onclick=\"document.getElementById('sbbackgroundcolour').value = 'grey';\">Grey</a> <br /> <div class=\"sbarDialogButton\"><a id=\"sbRandomColour\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Random</a></div> <div class=\"sbarDialogButton\"> <a id=\"sbColourReset\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Reset to Default</a></div>",
+					sbSiteColours: "<h2>Change this site's colours</h2> <label for=\"sbbackgroundcolour\">Background Colour: </label><input type=\"text\" name=\"sbpagebackgroundcolour\" id=\"sbpagebackgroundcolour\"><br /> <label for=\"sbtextcolour\">Text Colour: </label><input type=\"text\" name=\"sbtextcolour\" id=\"sbtextcolour\"> <div class=\"sbarDialogButton\"><a id=\"applyPageColours\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Apply</a></div>",
+					sbAttachCSS: "<h2>Atatch CSS Stylesheet<h2><div class=\"sbarDialogButton\"><a id=\"sbApplyCSS-wb\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> White and Black</a></div> <div class=\"sbarDialogButton\"><a id=\"sbApplyCSS-yb\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Yellow and Black</a></div>"
 				} 
 		},
 		settings: { id: 'settings', ico: 'cog.png', act: 'settingsDialog(0)', tip: 'Settings', styleClass: ' fright', clickEnabled: true,
 		 		dialogs: {
-					landingDialog: "<h2>StudyBar Settings</h2> <div class=\"sbarDialogButton\"> <a href=\"#\" id=\"sbResetDisabled\"><img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Reset Disabled websites</a></div> <div class=\"sbarDialogButton\"> <a href=\"#\" id=\"sbresetAll\"><img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Reset Everything to defaults</a></div>"
+					landingDialog: "<h2>StudyBar Settings</h2> <div class=\"sbarDialogButton\"> <a id=\"sbResetDisabled\"><img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Reset Disabled websites</a></div> <div class=\"sbarDialogButton\"> <a href=\"#\" id=\"sbresetAll\"><img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Reset Everything to defaults</a></div>"
 				}
 		},
 		help : { id: 'help', ico: 'information.png', act: 'something()', tip: 'Help', styleClass: ' fright', clickEnabled: true }
 	};
 	
-var closeDialogs = { landing: "<h2>Studybar is about to exit</h2> <div class=\"sbarDialogButton\"><a href=\"#\" id=\"sbCloseThisSite\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Close for this site only</a></div> <div class=\"sbarDialogButton\"><a href=\"#\" id=\"sbCloseAllSites\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Close for all sites</a></div>" };	
+var closeDialogs = { landing: "<h2>Studybar is about to exit</h2> <div class=\"sbarDialogButton\"><a id=\"sbCloseThisSite\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Close for this site only</a></div> <div class=\"sbarDialogButton\"><a href=\"#\" id=\"sbCloseAllSites\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Close for all sites</a></div>" };	
 	
 var buttons = {};
 
@@ -303,16 +303,22 @@ window.changeColours = function(level){
 			$('#sBarCSS').remove();
 			attachCSS(settings.baseURL + settings.stylesheetURL, "sBarCSS");
 		});
+		
+		mbEventListener('sbApplyCSS-wb', "click", function(e){ 
+			attachCSS(settings.baseURL + "presentation/stylesheets/highvis-wb.css", "highvis-wb");
+			$('#sBarCSS').remove();
+			attachCSS(settings.baseURL + settings.stylesheetURL, "sBarCSS");
+		});
 	}
 }
 
 
 window.getDictionaryRef = function(){
-	$("#sb-btnico-dictionary").attr('src', settings.baseURL + "presentation/images/loading.gif");
-	
 	var data = eval("\"" + getSelectedText() + "\";");
 
 	if(data != ""){
+		$("#sb-btnico-dictionary").attr('src', settings.baseURL + "presentation/images/loading.gif");
+		
 		// Firefox greasemonkey cross domain XMLHTTP.
 		if(XHRMethod == 'GM-XHR'){
 		
@@ -385,11 +391,34 @@ window.getDictionaryResponse = function(response){
 
 window.parseDictionaryResponse = function(input){
 	
+	// Remove translations blocks.
+	output = input.replace(/^((?:={2,})+translations(?:={2,})+.*?)((?:={2,}).*?(?:={2,})|(?:-{4}))/ig, '$2');	
+	
 	// Replace headings.
-	var output = input.replace(/(={2,})+(.*?)(?:={2,})+/ig, function(match, g1, g2, position, input) {
+	var output = output.replace(/(={2,})+(.*?)(?:={2,})+/ig, function(match, g1, g2, position, input) {
     	return "<h" + g1.length + ">" + g2 + "</h" + g1.length + ">";
     });
 	
+	// Replace bold / italics.
+	output = output.replace(/(('+){1}(.*?)(?:'+){1})/ig, function(match, g1, g2, g3, position, input){
+		switch(g2.length){
+		
+			case 2:
+				return "<em>" + g3 + "</em>";
+			break;
+			
+			case 3:
+				return "<b>" + g3 + "</b>";
+			break;
+			
+			case 5:
+				return "<em><b>" + g3 + "</b></em>";
+			break;
+		}
+	
+	});
+	
+	// Replace text in curley brackets.
 	output = output.replace(/(\{\{(?:(.*?)\|)+(.*?)\}\})/ig, function(match, g1, g2, g3, position, input){
 		switch(g2.toLowerCase()){
 			case 'also':
@@ -410,6 +439,10 @@ window.parseDictionaryResponse = function(input){
 		}
 	});
 	
+	// Replace lists.
+	output = output.replace(/([#|\*]+(.*?)\n)/ig, '<li>$2</li>');
+	
+	// Replace unmatched doublebraces.
 	output = output.replace(/(\{\{(\w{1,})\}\})/ig, "<i>$2</i>");
 	
 	output = output.replace(/(\[\[(.*?)\]\])/ig, "$2");
@@ -426,7 +459,7 @@ window.getSelectedText = function(){
      } else if (document.selection){
         text = document.selection.createRange().text;
      }
-    return text;
+	return String(text).replace(/([\s]+)/ig, '');
 }
 
 // <Name> setColour
