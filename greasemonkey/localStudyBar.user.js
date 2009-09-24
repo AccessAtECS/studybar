@@ -38,7 +38,7 @@ var originalPageSettings = { fontsize: "" };
 
 var settings = { 	stylesheetURL: "presentation/style.css",
 					baseURL: "http://access.ecs.soton.ac.uk/seb/StudyBar/",
-					aboutBox: "<h2>About StudyBar</h2>Version 0.2.691 alpha<br /><br />Created by Sebastian Skuse<br />Learning Societies Lab<br /> &copy; University of Southampton 2009.",
+					aboutBox: "<h2>About StudyBar</h2>Version 0.2.733 alpha<br /><br />Created by Sebastian Skuse under supervision of Mike Wald<br />Learning Societies Lab<br /> &copy; University of Southampton 2009.<br />",
 					textSizeLevel: 1 
 				};
 
@@ -46,7 +46,11 @@ var settings = { 	stylesheetURL: "presentation/style.css",
 var toolbarItems = {
 		resizeUp: { id: 'resizeUp', ico: 'font_increase.png', act: 'resizeText(0.5);', tip: 'Increase text size', clickEnabled: true },
 		resizeDown: { id: 'resizeDown', ico: 'font_decrease.png', act: 'resizeText(-0.5)', tip: 'Decrease text size', clickEnabled: true },
-		fontSettings: { id: 'fontSettings', ico: 'font.png', act: 'something()', tip: 'Font settings', clickEnabled: true },
+		fontSettings: { id: 'fontSettings', ico: 'font.png', act: 'fontSettingsDialog()', tip: 'Font settings', clickEnabled: true,
+				dialogs: {
+					main: "<h2>Page font settings</h2>"
+				}
+		},
 		spell: { id: 'spell', ico: 'spell-off.png', act: 'spellCheckPage()', tip: 'Start / Stop spellchecker', clickEnabled: true },
 		TTS: { id: 'tts', ico: 'sound.png', act: 'ttsOptions()', tip: 'Text to Speech options', clickEnabled: true,
 				dialogs: {
@@ -58,10 +62,10 @@ var toolbarItems = {
 		dictionary: { id: 'dictionary', ico: 'book_open.png', act: 'getDictionaryRef()', tip: 'Dictionary', clickEnabled: true },
 		CSS: { id: 'changecss', ico: 'palette.png', act: 'changeColours(0)', tip: 'Change Styles', clickEnabled: true, 
 				dialogs: { 
-					colourDialog: "<h2>Change Colour settings</h2> <div class=\"sbarDialogButton\"> <a id=\"sbColourChange\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Change StudyBar Colour</a></div> <div class=\"sbarDialogButton\"><a id=\"sbChangeSiteColours\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Change Site Colours</a></div> <div class=\"sbarDialogButton\"><a id=\"sbAttachCSSStyle\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Attach CSS Style</a></div>",
+					colourDialog: "<h2>Change Colour settings</h2> <div class=\"sbarDialogButton\"> <a id=\"sbColourChange\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Change StudyBar Colour</a></div> <div class=\"sbarDialogButton\"><a id=\"sbChangeSiteColours\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Change Site Colours</a></div> <div class=\"sbarDialogButton\"><a id=\"sbAttachCSSStyle\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Premade page styles</a></div>",
 					sbColourDialog: "<h2>Change StudyBar Colour</h2> <label for=\"sbbackgroundcolour\">Background Colour: </label><input type=\"text\" name=\"sbbackgroundcolour\" id=\"sbbackgroundcolour\"> <a id=\"sbSetColour\"><img src=\"" + settings.baseURL + "/presentation/images/accept.png \" /> Set</a> <br /> <a onclick=\"document.getElementById('sbbackgroundcolour').value = 'black';\">Black</a> <a onclick=\"document.getElementById('sbbackgroundcolour').value = 'white';\">White</a> <a onclick=\"document.getElementById('sbbackgroundcolour').value = 'grey';\">Grey</a> <br /> <div class=\"sbarDialogButton\"><a id=\"sbRandomColour\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Random</a></div> <div class=\"sbarDialogButton\"> <a id=\"sbColourReset\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Reset to Default</a></div>",
-					sbSiteColours: "<h2>Change this site's colours</h2> <label for=\"sbbackgroundcolour\">Background Colour: </label><input type=\"text\" name=\"sbpagebackgroundcolour\" id=\"sbpagebackgroundcolour\"><br /> <label for=\"sbtextcolour\">Text Colour: </label><input type=\"text\" name=\"sbtextcolour\" id=\"sbtextcolour\"> <div class=\"sbarDialogButton\"><a id=\"applyPageColours\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Apply</a></div>",
-					sbAttachCSS: "<h2>Atatch CSS Stylesheet<h2><div class=\"sbarDialogButton\"><a id=\"sbApplyCSS-wb\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> White and Black</a></div> <div class=\"sbarDialogButton\"><a id=\"sbApplyCSS-yb\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Yellow and Black</a></div>"
+					sbSiteColours: "<h2>Change this site's colours</h2> <label for=\"sbbackgroundcolour\">Background Colour: </label><input type=\"text\" name=\"sbpagebackgroundcolour\" id=\"sbpagebackgroundcolour\"><br /> <label for=\"sbtextcolour\">Text Colour: </label><input type=\"text\" name=\"sbtextcolour\" id=\"sbtextcolour\"><br /><label for=\"sblinkcolour\">Link Colour: </label><input type=\"text\" name=\"sblinkcolour\" id=\"sblinkcolour\"> <div class=\"sbarDialogButton\"><a id=\"applyPageColours\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Apply</a></div>",
+					sbAttachCSS: "<h2>Premade page styles<h2><div class=\"sbarDialogButton\"><a id=\"sbApplyCSS-wb\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> White and Black</a></div> <div class=\"sbarDialogButton\"><a id=\"sbApplyCSS-yb\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Yellow and Black</a></div>"
 				} 
 		},
 		settings: { id: 'settings', ico: 'cog.png', act: 'settingsDialog(0)', tip: 'Settings', styleClass: ' fright', clickEnabled: true,
@@ -196,6 +200,7 @@ window.resizeText = function(multiplier) {
 	//$('table').css('font-size', ''); 
 	document.body.style.fontSize = ''; 
   } else {  
+	alert(newVal);
 	//$('div').css('font-size', newVal);
 	//$('p').css('font-size', newVal);
 	//$('table').css('font-size', newVal);
@@ -487,6 +492,12 @@ window.ttsOptions = function(){
 }
 
 
+window.fontSettingsDialog = function(){
+	jQuery.facebox( fontSettings.dialogs.main );
+
+}
+
+
 // <Name> settingsDialog
 // <Purpose> Load the settings dialog.
 
@@ -745,7 +756,7 @@ if (window == window.top) {
 		startProcess();
 	} else {
 		// Register the greasemonkey menu items.
-		GM_registerMenuCommand("Local StudyBar", function(){ loadStudyBar() });
+		GM_registerMenuCommand("Load StudyBar Toolbar", function(){ loadStudyBar() });
 		
 		// If the user had studybar open, reopen it again.
 		var autoLoadValue = GM_getValue('autoload', false);
