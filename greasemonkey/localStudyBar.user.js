@@ -19,8 +19,8 @@
 // --------------------------------------------------------------------
 //
 // ==UserScript==
-// @name          localStudyBar
-// @namespace     http://users.ecs.soton.ac.uk/ss1706/
+// @name          StudyBar
+// @namespace     http://users.ecs.soton.ac.uk/scs/
 // @description   Accessibility toolbar
 // @include       *
 // @require       http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js
@@ -36,9 +36,10 @@ var disabledSites;
 
 var originalPageSettings = { fontsize: "" };
 
-var settings = { 	stylesheetURL: "presentation/style.css",
+var settings = {
+					stylesheetURL: "presentation/style.css",
 					baseURL: "http://access.ecs.soton.ac.uk/seb/StudyBar/",
-					aboutBox: "<h2>About StudyBar</h2>Version 0.2.733 alpha<br /><br />Created by Sebastian Skuse under supervision of Mike Wald<br />Learning Societies Lab<br /> &copy; University of Southampton 2009.<br />",
+					aboutBox: "<h2>About StudyBar</h2>Version 0.3.777 alpha<br /><br />Created by Sebastian Skuse under supervision of Mike Wald<br />Learning Societies Lab<br /> &copy; University of Southampton 2009.<br />Icons &copy; {{PLACEHOLDER}} under CC licence.",
 					textSizeLevel: 1 
 				};
 
@@ -48,10 +49,10 @@ var toolbarItems = {
 		resizeDown: { id: 'resizeDown', ico: 'font_decrease.png', act: 'resizeText(-0.5)', tip: 'Decrease text size', clickEnabled: true },
 		fontSettings: { id: 'fontSettings', ico: 'font.png', act: 'fontSettingsDialog()', tip: 'Font settings', clickEnabled: true,
 				dialogs: {
-					main: "<h2>Page font settings</h2>"
+					main: "<h2>Page font settings</h2><label for=\"sbfontface\">Font Face:</label> <select id=\"sbfontface\"><option value=\"sitespecific\">--Site Specific--</option><option value=\"arial\">Arial</option><option value=\"courier\">Courier</option><option value=\"cursive\">Cursive</option><option value=\"fantasy\">Fantasy</option><option value=\"georgia\">Georgia</option><option value=\"helvetica\">Helvetica</option><option value=\"impact\">Impact</option><option value=\"monaco\">Monaco</option><option value=\"monospace\">Monospace</option><option value=\"sans-serif\">Sans-Serif</option><option value=\"tahoma\">Tahoma</option><option value=\"times new roman\">Times New Roman</option><option value=\"trebuchet ms\">Trebuchet MS</option><option value=\"verdant\">Verdana</option></select><br /> <label for=\"sblinespacing\">Line Spacing:</label> <input type=\"text\" name=\"sblinespacing\" id=\"sblinespacing\" maxlength=\"3\" size=\"3\" value=\"100\">%<br /><br /><div class=\"sbarDialogButton\"><a id=\"sbfontfaceapply\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Apply</a></div>"
 				}
 		},
-		spell: { id: 'spell', ico: 'spell-off.png', act: 'spellCheckPage()', tip: 'Start / Stop spellchecker', clickEnabled: true },
+		spell: { id: 'spell', ico: 'spell-off.png', act: 'spellCheckPage()', tip: 'Start / Stop spellchecker', clickEnabled: true, checkerEnabled: false },
 		TTS: { id: 'tts', ico: 'sound.png', act: 'ttsOptions()', tip: 'Text to Speech options', clickEnabled: true,
 				dialogs: {
 					options: "<h2>Text to Speech options</h2> <div class=\"sbarDialogButton\"> <a id=\"sbStartTTS\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Get Text-To-Speech for this page</a></div>",
@@ -73,7 +74,11 @@ var toolbarItems = {
 					landingDialog: "<h2>StudyBar Settings</h2> <div class=\"sbarDialogButton\"> <a id=\"sbResetDisabled\"><img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Reset Disabled websites</a></div> <div class=\"sbarDialogButton\"> <a href=\"#\" id=\"sbresetAll\"><img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Reset Everything to defaults</a></div>"
 				}
 		},
-		help : { id: 'help', ico: 'information.png', act: 'something()', tip: 'Help', styleClass: ' fright', clickEnabled: true }
+		help : { id: 'help', ico: 'information.png', act: 'studybarHelp()', tip: 'Help', styleClass: ' fright', clickEnabled: true,
+				dialogs: {
+					landingPage: "<h2>StudyBar Help</h2>"
+				}
+		}
 	};
 	
 var closeDialogs = { landing: "<h2>Studybar is about to exit</h2> <div class=\"sbarDialogButton\"><a id=\"sbCloseThisSite\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Close for this site only</a></div> <div class=\"sbarDialogButton\"><a href=\"#\" id=\"sbCloseAllSites\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Close for all sites</a></div>" };	
@@ -179,6 +184,7 @@ window.attachCSS = function(url, id){
 // <ToDo> very buggy. Resizes studybar text, which we dont want.
 
 window.resizeText = function(multiplier) {
+
   if (document.body.style.fontSize == "") {
     document.body.style.fontSize = "10px";
   }
@@ -214,17 +220,17 @@ window.resizeText = function(multiplier) {
 
 window.startTTS = function(){
 
+	var $sendData = $(document.body).clone();
+	
+	$sendData.children('#sbar').remove();
+	$sendData.children('#facebox').remove();
+	$sendData.children('script').remove();
+	$sendData.children('style').remove();
+	$sendData.children('facebox_overlay').remove();
+
 	// What method of XHR are we using for this?
 	if(XHRMethod == 'GM-XHR'){
 		jQuery.facebox.changeFaceboxContent( toolbarItems.TTS.dialogs.starting );
-		
-		var $sendData = $(document.body).clone();
-		
-		$sendData.children('#sbar').remove();
-		$sendData.children('#facebox').remove();
-		$sendData.children('script').remove();
-		$sendData.children('style').remove();
-		$sendData.children('facebox_overlay').remove();
 		
 		GM_xmlhttpRequest({ method: "POST",
 				url: "http://access.ecs.soton.ac.uk/seb/StudyBar/TTS/jobController.php", 
@@ -234,14 +240,39 @@ window.startTTS = function(){
 			});
 	} else {
 		// Another browser. We'll use the custom xmlhttprequest method.
+		
+		window.attachJS( settings.baseURL + 'xmlhttp/remote.php?rt=tts&id=' + Math.floor(Math.random() * 5001) + '&data=' + encodeURI( b64($sendData.html()) ), 'CS-XHR' );
+						
+
+		this.ttsAjaxInterval = setInterval(function(){
+			self.checkCSXHRTTSResponse();
+		}, 100);
 	}
 
 }
 
+window.checkCSXHRTTSResponse = function(){
+	// Do we have data yet? If so, lets clear the interval and parse the results!
+	if( (typeof CSresponseObject) != "undefined" ){
+		clearInterval( this.ttsAjaxInterval );
+		
+		// Copy the response object to a local object.
+		var RO = CSresponseObject;
+		
+		// Remove the response JS.
+		$('#CS-XHR').remove();
+
+		ttsJobSent( RO.data );
+	}	
+}
 
 window.ttsJobSent = function(response){
 	
-	var ro = eval("(" + response.responseText + ")");	
+	if(XHRMethod == "GM-XHR"){
+		var ro = eval("(" + response.responseText + ")");
+	} else {
+		var ro = eval("(" + response + ")");
+	}
 	
 	window.setTimeout(countdownTTS, 0, (ro.est_completion / ro.chunks), ro.ID  );
 	
@@ -250,7 +281,6 @@ window.ttsJobSent = function(response){
 }
 
 window.countdownTTS = function(){
-
 	if(arguments[0] == 0){
 		window.setTimeout(playTTS, 0, arguments[1]);
 	} else {
@@ -271,11 +301,25 @@ window.playTTS = function(){
 // <ToDo> Does not work first invoke for some reason. Possibly to do with xmlhttprequest change for GM?
 
 window.spellCheckPage = function(){
-	console.log("spellchecker activated");
-
-	$('#sb-btnico-spell').attr('src', settings.baseURL + "presentation/images/spell.png");
-	$("textarea").spellcheck({ useXHRMethod: XHRMethod });
-	$('input[type=text]').spellcheck({ useXHRMethod: XHRMethod });
+	//if(toolbarItems.spell.checkerEnabled == false){
+	
+		$("textarea").spellcheck({ useXHRMethod: XHRMethod });
+		$('input[type=text]').spellcheck({ useXHRMethod: XHRMethod });
+		
+		$('#sb-btnico-spell').attr('src', settings.baseURL + "presentation/images/spell.png");
+		toolbarItems.spell.checkerEnabled = true;
+	/*} else {
+		alert('removing spellcheck');
+		
+		$('textarea').unbind('keypress blur paste');
+		$('textarea').removeData('spellchecker');
+		
+		$('input[type=text]').unbind('keypress blur paste');
+		$('input[type=text]').removeData('spellchecker');		
+		
+		$('#sb-btnico-spell').attr('src', settings.baseURL + "presentation/images/spell-off.png");
+		toolbarItems.spell.checkerEnabled = false;
+	}*/
 }
 
 
@@ -299,7 +343,22 @@ window.changeColours = function(level){
 		mbEventListener('sbColourReset', "click", function(e){ setColour("white"); });
 	}
 	if(level == 2){
+		// Site colours
 		jQuery.facebox.changeFaceboxContent( toolbarItems.CSS.dialogs.sbSiteColours );
+		mbEventListener('applyPageColours', "click", function(e){ 
+			if( $('#sbpagebackgroundcolour').val() != "undefined"){
+				document.body.style.backgroundColor = $('#sbpagebackgroundcolour').val();
+			}
+			
+			if( $('#sbtextcolour').val() != "undefined" ){
+				$('body').css('color', $('#sbtextcolour').val());
+			}
+			
+			if( $('#sblinkcolour').val() != "undefined" ){
+				$('a').css('color', $('#sblinkcolour').val());
+			}
+		});
+		
 	}
 	if(level == 3){
 		jQuery.facebox.changeFaceboxContent( toolbarItems.CSS.dialogs.sbAttachCSS );
@@ -352,19 +411,19 @@ window.getDictionaryRef = function(){
 
 
 window.checkCSXHRDictResponse = function(){
-		// Do we have data yet? If so, lets clear the interval and parse the results!
-		if( (typeof CSresponseObject) != "undefined" ){
-			clearInterval( this.dictAjaxInterval );
-			
-			// Copy the response object to a local object.
-			var RO = CSresponseObject;
-			
-			// Remove the response JS.
-			$('#CS-XHR').remove();
+	// Do we have data yet? If so, lets clear the interval and parse the results!
+	if( (typeof CSresponseObject) != "undefined" ){
+		clearInterval( this.dictAjaxInterval );
+		
+		// Copy the response object to a local object.
+		var RO = CSresponseObject;
+		
+		// Remove the response JS.
+		$('#CS-XHR').remove();
 
-			window.getDictionaryResponse( RO.data );
-		}		
-	},
+		window.getDictionaryResponse( RO.data );
+	}		
+}
 
 window.getDictionaryResponse = function(response){
 
@@ -385,7 +444,7 @@ window.getDictionaryResponse = function(response){
 			definition = parseDictionaryResponse(definition);
 		} else {
 			var definition = "Unknown word";
-			var title = "Unknown";
+			var title = eval("ro.query.pages[\"-1\"].title;");
 		}
 	}
 	
@@ -493,8 +552,14 @@ window.ttsOptions = function(){
 
 
 window.fontSettingsDialog = function(){
-	jQuery.facebox( fontSettings.dialogs.main );
-
+	jQuery.facebox( toolbarItems.fontSettings.dialogs.main );
+	mbEventListener('sbfontfaceapply', 'click', function(e){
+		if($('#sbfontface').val() != "--Site Specific--") $('body').css('font-family', $('#sbfontface').val());
+		$('div').css('line-height', $('#sblinespacing').val() + "%");
+		$('#sbar').css('line-height', '0%');
+		//$('#sbar').nextAll()
+	});
+	//sbfontfaceapply
 }
 
 
@@ -555,6 +620,11 @@ window.unloadStudyBar = function(all){
 	$('.tipsy').remove();
 	
 	document.body.style.fontSize = originalPageSettings.fontsize;
+}
+
+window.studybarHelp = function(){
+	jQuery.facebox( toolbarItems.help.dialogs.landingPage );
+
 }
 
 
@@ -755,11 +825,12 @@ if (window == window.top) {
 		
 		startProcess();
 	} else {
-		// Register the greasemonkey menu items.
-		GM_registerMenuCommand("Load StudyBar Toolbar", function(){ loadStudyBar() });
 		
 		// If the user had studybar open, reopen it again.
 		var autoLoadValue = GM_getValue('autoload', false);
+		
+		// Register the greasemonkey menu items.
+		GM_registerMenuCommand("Load StudyBar Toolbar", function(){ loadStudyBar() });
 		
 		// Get the blocked sites list
 		disabledSites = GM_getValue('blocked', []);
