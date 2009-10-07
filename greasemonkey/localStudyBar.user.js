@@ -30,6 +30,8 @@
 // @require       http://access.ecs.soton.ac.uk/seb/StudyBar/button.class.js
 // ==/UserScript==
 
+var versionString = "0.3.944 pre-beta";
+
 var includeScripts = [];
 
 var disabledSites;
@@ -37,10 +39,11 @@ var disabledSites;
 var originalPageSettings = { fontsize: "" };
 
 var settings = {
-					stylesheetURL: "presentation/style.css",
-					baseURL: "http://access.ecs.soton.ac.uk/seb/StudyBar/",
-					aboutBox: "<h2>About StudyBar</h2>Version 0.3.777 alpha<br /><br />Created by Sebastian Skuse under supervision of Mike Wald<br />Learning Societies Lab<br /> &copy; University of Southampton 2009.<br />Icons &copy; {{PLACEHOLDER}} under CC licence.",
-					textSizeLevel: 1 
+				stylesheetURL: "presentation/style.css",
+				baseURL: "http://access.ecs.soton.ac.uk/seb/StudyBar/",
+				aboutBox: "<h2>About StudyBar</h2>Version " + versionString + "<br /><br />Created by Sebastian Skuse under supervision of Mike Wald<br />Learning Societies Lab<br /> &copy; University of Southampton 2009.<br />Icons &copy; {{PLACEHOLDER}} under CC licence.",
+				textSizeLevel: 1,
+				ttsSplitChunkSize: 700
 				};
 
 
@@ -49,7 +52,7 @@ var toolbarItems = {
 		resizeDown: { id: 'resizeDown', ico: 'font_decrease.png', act: 'resizeText(-0.5)', tip: 'Decrease text size', clickEnabled: true },
 		fontSettings: { id: 'fontSettings', ico: 'font.png', act: 'fontSettingsDialog()', tip: 'Font settings', clickEnabled: true,
 				dialogs: {
-					main: "<h2>Page font settings</h2><label for=\"sbfontface\">Font Face:</label> <select id=\"sbfontface\"><option value=\"sitespecific\">--Site Specific--</option><option value=\"arial\">Arial</option><option value=\"courier\">Courier</option><option value=\"cursive\">Cursive</option><option value=\"fantasy\">Fantasy</option><option value=\"georgia\">Georgia</option><option value=\"helvetica\">Helvetica</option><option value=\"impact\">Impact</option><option value=\"monaco\">Monaco</option><option value=\"monospace\">Monospace</option><option value=\"sans-serif\">Sans-Serif</option><option value=\"tahoma\">Tahoma</option><option value=\"times new roman\">Times New Roman</option><option value=\"trebuchet ms\">Trebuchet MS</option><option value=\"verdant\">Verdana</option></select><br /> <label for=\"sblinespacing\">Line Spacing:</label> <input type=\"text\" name=\"sblinespacing\" id=\"sblinespacing\" maxlength=\"3\" size=\"3\" value=\"100\">%<br /><br /><div class=\"sbarDialogButton\"><a id=\"sbfontfaceapply\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Apply</a></div>"
+					main: "<h2>Page font settings</h2><label for=\"sbfontface\">Font Face:</label> <select id=\"sbfontface\"><option value=\"sitespecific\">--Site Specific--</option><option value=\"arial\">Arial</option><option value=\"courier\">Courier</option><option value=\"cursive\">Cursive</option><option value=\"fantasy\">Fantasy</option><option value=\"georgia\">Georgia</option><option value=\"helvetica\">Helvetica</option><option value=\"impact\">Impact</option><option value=\"monaco\">Monaco</option><option value=\"monospace\">Monospace</option><option value=\"sans-serif\">Sans-Serif</option><option value=\"tahoma\">Tahoma</option><option value=\"times new roman\">Times New Roman</option><option value=\"trebuchet ms\">Trebuchet MS</option><option value=\"verdant\">Verdana</option></select><br /><br /> <label for=\"sblinespacing\">Line Spacing:</label> <input type=\"text\" name=\"sblinespacing\" id=\"sblinespacing\" maxlength=\"3\" size=\"3\" value=\"100\">%<br /><br /><div class=\"sbarDialogButton\"><a id=\"sbfontfaceapply\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Apply</a></div>"
 				}
 		},
 		spell: { id: 'spell', ico: 'spell-off.png', act: 'spellCheckPage()', tip: 'Start / Stop spellchecker', clickEnabled: true, checkerEnabled: false },
@@ -59,14 +62,14 @@ var toolbarItems = {
 					starting: "<h2>Text To Speech</h2> <center>Text to Speech conversion is taking place. <br /><img src='http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/loadingbig.gif' /><br />Time remaining: <div id='sbttstimeremaining'>calculating</div><br />Please wait... <center>"
 				}
 		},
-		references: { id: 'references', ico: 'book_link.png', act: 'something()', tip: 'References', clickEnabled: true },
+		references: { id: 'references', ico: 'book_link.png', act: 'alert(\'References is currently not implemented in this beta version.\')', tip: 'References', clickEnabled: true },
 		dictionary: { id: 'dictionary', ico: 'book_open.png', act: 'getDictionaryRef()', tip: 'Dictionary', clickEnabled: true },
 		CSS: { id: 'changecss', ico: 'palette.png', act: 'changeColours(0)', tip: 'Change Styles', clickEnabled: true, 
 				dialogs: { 
 					colourDialog: "<h2>Change Colour settings</h2> <div class=\"sbarDialogButton\"> <a id=\"sbColourChange\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Change StudyBar Colour</a></div> <div class=\"sbarDialogButton\"><a id=\"sbChangeSiteColours\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Change Site Colours</a></div> <div class=\"sbarDialogButton\"><a id=\"sbAttachCSSStyle\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Premade page styles</a></div>",
 					sbColourDialog: "<h2>Change StudyBar Colour</h2> <label for=\"sbbackgroundcolour\">Background Colour: </label><input type=\"text\" name=\"sbbackgroundcolour\" id=\"sbbackgroundcolour\"> <a id=\"sbSetColour\"><img src=\"" + settings.baseURL + "/presentation/images/accept.png \" /> Set</a> <br /> <a onclick=\"document.getElementById('sbbackgroundcolour').value = 'black';\">Black</a> <a onclick=\"document.getElementById('sbbackgroundcolour').value = 'white';\">White</a> <a onclick=\"document.getElementById('sbbackgroundcolour').value = 'grey';\">Grey</a> <br /> <div class=\"sbarDialogButton\"><a id=\"sbRandomColour\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Random</a></div> <div class=\"sbarDialogButton\"> <a id=\"sbColourReset\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Reset to Default</a></div>",
-					sbSiteColours: "<h2>Change this site's colours</h2> <label for=\"sbbackgroundcolour\">Background Colour: </label><input type=\"text\" name=\"sbpagebackgroundcolour\" id=\"sbpagebackgroundcolour\"><br /> <label for=\"sbtextcolour\">Text Colour: </label><input type=\"text\" name=\"sbtextcolour\" id=\"sbtextcolour\"><br /><label for=\"sblinkcolour\">Link Colour: </label><input type=\"text\" name=\"sblinkcolour\" id=\"sblinkcolour\"> <div class=\"sbarDialogButton\"><a id=\"applyPageColours\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Apply</a></div>",
-					sbAttachCSS: "<h2>Premade page styles<h2><div class=\"sbarDialogButton\"><a id=\"sbApplyCSS-wb\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> White and Black</a></div> <div class=\"sbarDialogButton\"><a id=\"sbApplyCSS-yb\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Yellow and Black</a></div>"
+					sbSiteColours: "<h2>Change this site's colours</h2> <label for=\"sbbackgroundcolour\" style=\"display:block\">Background Colour: </label><input type=\"text\" name=\"sbpagebackgroundcolour\" id=\"sbpagebackgroundcolour\"><br /> <label for=\"sbtextcolour\" style=\"display:block\">Text Colour: </label><input type=\"text\" name=\"sbtextcolour\" id=\"sbtextcolour\"><br /><label for=\"sblinkcolour\" style=\"display:block\">Link Colour: </label><input type=\"text\" name=\"sblinkcolour\" id=\"sblinkcolour\"> <div class=\"sbarDialogButton\"><a id=\"applyPageColours\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Apply</a></div>",
+					sbAttachCSS: "<h2>Premade page styles<h2><div class=\"sbarDialogButton\"><a id=\"sbApplyCSS-wb\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Black on White</a></div> <div class=\"sbarDialogButton\"><a id=\"sbApplyCSS-wbw\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> White on Black</a></div> <div class=\"sbarDialogButton\"><a id=\"sbApplyCSS-yb\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Yellow on Black</a></div>"
 				} 
 		},
 		settings: { id: 'settings', ico: 'cog.png', act: 'settingsDialog(0)', tip: 'Settings', styleClass: ' fright', clickEnabled: true,
@@ -76,7 +79,7 @@ var toolbarItems = {
 		},
 		help : { id: 'help', ico: 'information.png', act: 'studybarHelp()', tip: 'Help', styleClass: ' fright', clickEnabled: true,
 				dialogs: {
-					landingPage: "<h2>StudyBar Help</h2>"
+					landingPage: "<h2>StudyBar Help</h2> <h3>Topics</h3>"
 				}
 		}
 	};
@@ -112,7 +115,7 @@ window.loadStudyBar = function(){
 	doc.body.insertBefore(bar, doc.body.firstChild);
 	
 	// Add logo to studybar.
-	$("<a id=\"sbarlogo\"><img src=\"" + settings.baseURL +  "presentation/images/logo.png\" align=\"left\" border=\"0\" style=\"margin-top:6px\" /></a>").appendTo('#sbar');
+	$("<a id=\"sbarlogo\"><img src=\"" + settings.baseURL +  "presentation/images/logo.png\" align=\"left\" border=\"0\" style=\"margin-top:6px; float:left !important;\" /></a>").appendTo('#sbar');
 	
 	// Add items to the toolbar.
 	populateBar();
@@ -135,7 +138,6 @@ window.loadStudyBar = function(){
 		}
 	}
 	$("#sbarlogo").bind("click", function(e){ jQuery.facebox( settings.aboutBox ); });
-	
 }
 
 
@@ -179,6 +181,18 @@ window.attachCSS = function(url, id){
 	$('#facebox').remove();
 }
 
+window.CSStoInline = function(selector){
+	var elObject = $(selector).css();
+	var outString = "";
+	
+	for(var property in elObject){
+		outString += property +": " + elObject[property] + " !important; ";
+	}
+	
+	outString = outString.replace(/; $/, '');
+	$("#sbar").attr('style', outString);
+}
+
 // <Name> resizeText
 // <Purpose> Size the text on the page up/down.
 // <ToDo> very buggy. Resizes studybar text, which we dont want.
@@ -186,17 +200,28 @@ window.attachCSS = function(url, id){
 window.resizeText = function(multiplier) {
 
   if (document.body.style.fontSize == "") {
-    document.body.style.fontSize = "10px";
+    //document.body.style.fontSize = "10px";
   }
+  
+  //alert($('body').css('fontSize'));
   
   //var newVal = parseFloat(settings.textSizeLevel) + (multiplier * 0.2) + "em";
   // document.body.style.fontSize = newVal;
+
+//alert("level: " + settings.textSizeLevel);
+  
+  if(settings.textSizeLevel == 1 && multiplier < 0) {
+  	currentLevel = 1;
+  } else {
+  	currentLevel = 1 + (settings.textSizeLevel * 0.2);
+  }
+
   
   if(multiplier > 0){
-  	var newVal = parseFloat(1 + (settings.textSizeLevel * 0.2) ) + 0.2 + "em";
+  	var newVal = parseFloat( currentLevel ) + 0.2 + "em";
   	settings.textSizeLevel += 1;
   } else {
-  	var newVal = parseFloat(1 + (settings.textSizeLevel * 0.2) ) - 0.2 + "em";
+  	var newVal = parseFloat( currentLevel ) - 0.2 + "em";
   	settings.textSizeLevel -= 1;
   }
   
@@ -206,7 +231,6 @@ window.resizeText = function(multiplier) {
 	//$('table').css('font-size', ''); 
 	document.body.style.fontSize = ''; 
   } else {  
-	alert(newVal);
 	//$('div').css('font-size', newVal);
 	//$('p').css('font-size', newVal);
 	//$('table').css('font-size', newVal);
@@ -240,18 +264,54 @@ window.startTTS = function(){
 			});
 	} else {
 		// Another browser. We'll use the custom xmlhttprequest method.
-		
-		window.attachJS( settings.baseURL + 'xmlhttp/remote.php?rt=tts&id=' + Math.floor(Math.random() * 5001) + '&data=' + encodeURI( b64($sendData.html()) ), 'CS-XHR' );
-						
 
-		this.ttsAjaxInterval = setInterval(function(){
-			self.checkCSXHRTTSResponse();
-		}, 100);
+		// Send the data in chunks, as chances are we cant get it all into one request.
+		
+		var transmitData = b64($sendData.html());
+		
+		var chunks = Math.ceil(transmitData.length / settings.ttsSplitChunkSize);
+		
+		var reqID = Math.floor(Math.random() * 5001);
+		
+		jQuery.facebox.changeFaceboxContent( "<h2>Processing</h2><p>Compacting and transmitting data...</p><div id='compactStatus'>0 / " + chunks + "</div>" );
+		
+		sendTTSChunk(transmitData, 1, chunks, reqID);
+		
 	}
 
 }
 
-window.checkCSXHRTTSResponse = function(){
+window.sendTTSChunk = function(fullData, block, totalBlocks, reqID){
+
+	if(block == 1){
+		var start = 0;
+	} else {
+		var start = (settings.ttsSplitChunkSize * block);
+	}
+	
+	if( (start + settings.ttsSplitChunkSize) > fullData.length ){
+		var endPoint = fullData.length;
+	} else {
+		var endPoint = (start + settings.ttsSplitChunkSize);
+	}
+	
+	var dataChunk = fullData.substring(start, endPoint );
+
+	if( block == totalBlocks ){
+		var urlString = settings.baseURL + 'xmlhttp/remote.php?rt=tts&id=' + reqID + '&data=' + dataChunk + "&chunkData=" + totalBlocks + "-" + block + "&page=" + encodeURIComponent(window.location);
+	} else {
+		var urlString = settings.baseURL + 'xmlhttp/remote.php?rt=tts&id=' + reqID + '&data=' + dataChunk + "&chunkData=" + totalBlocks + "-" + block;
+	}
+
+	window.attachJS( urlString, 'CS-XHR' );
+
+	this.ttsAjaxInterval = setInterval(function(){
+		self.checkCSXHRTTSResponse(fullData, block, totalBlocks, reqID);
+	}, 100);	
+
+}
+
+window.checkCSXHRTTSResponse = function(fullData, block, totalBlocks, reqID){
 	// Do we have data yet? If so, lets clear the interval and parse the results!
 	if( (typeof CSresponseObject) != "undefined" ){
 		clearInterval( this.ttsAjaxInterval );
@@ -262,7 +322,24 @@ window.checkCSXHRTTSResponse = function(){
 		// Remove the response JS.
 		$('#CS-XHR').remove();
 
-		ttsJobSent( RO.data );
+		//alert("Data from server: " + RO.data.message + ", Block " + block + " of " + totalBlocks);
+
+		$("#compactStatus").html(block + " / " + totalBlocks);
+
+		if(block == totalBlocks){
+			// Finished request..
+			jQuery.facebox.changeFaceboxContent( toolbarItems.TTS.dialogs.starting );
+			
+			ttsJobSent( RO );
+		} else {
+			// Send the next block.
+			if(RO.data.message == "ChunkSaved"){
+				sendTTSChunk(fullData, (block + 1), totalBlocks, reqID);
+			} else {
+				jQuery.facebox.changeFaceboxContent("<h2>Error</h2><p>An error occured on the server. Please try again later.</p>");
+			}
+		}
+
 	}	
 }
 
@@ -274,10 +351,18 @@ window.ttsJobSent = function(response){
 		var ro = eval("(" + response + ")");
 	}
 	
-	window.setTimeout(countdownTTS, 0, (ro.est_completion / ro.chunks), ro.ID  );
+	if(ro.status == "encoding" && ro.status != "failure"){
+		if(identifyBrowser() == "FF"){
+			window.setTimeout(countdownTTS, 0, (ro.est_completion / ro.chunks), ro.ID );
+		} else {
+			setTimeout(function(){
+				countdownTTSCB( (ro.est_completion / ro.chunks), ro.ID );
+			}, 0);
+		}
+	} else if(ro.status == "failure" && ro.reason == "overcapacity"){
+		jQuery.facebox("<h2>Error</h2> <p>The server is currently over capacity for text to speech conversions. Please try again later.</p>");
+	}
 	
-	//$('#sbttstimeremaining').html( (ro.est_completion / ro.chunks) + " seconds" );
-	//window.setTimeout(playTTS, (((ro.est_completion / ro.chunks) * 1000) + 2000), ro.ID );
 }
 
 window.countdownTTS = function(){
@@ -286,6 +371,22 @@ window.countdownTTS = function(){
 	} else {
 		$('#sbttstimeremaining').html( arguments[0] + " seconds" );
 		window.setTimeout(countdownTTS, 1000, (arguments[0] - 1), arguments[1]);
+	}
+}
+
+window.countdownTTSCB = function(tLeft, id){
+	if(tLeft == 0){
+		setTimeout(function(){ playTTSCB(id) }, 0);
+	} else {
+		$('#sbttstimeremaining').html( tLeft + " seconds" );
+		window.setTimeout(countdownTTS, 1000, (tLeft - 1), id);
+	}
+}
+
+window.playTTSCB = function(id){
+	if(identifyBrowser() != "IE"){
+		$('#sbar').append( $("<embed src=\"" + settings.baseURL + "TTS/player/player-licensed.swf\" width=\"200\" height=\"300\" allowscriptaccess=\"always\" allowfullscreen=\"false\" flashvars=\"file=" + settings.baseURL + "TTS/cache/" + id + ".xml&autostart=true&playlist=bottom&repeat=list\" />") );
+		$(document).trigger('close.facebox');
 	}
 }
 
@@ -364,14 +465,17 @@ window.changeColours = function(level){
 		jQuery.facebox.changeFaceboxContent( toolbarItems.CSS.dialogs.sbAttachCSS );
 		mbEventListener('sbApplyCSS-yb', "click", function(e){ 
 			attachCSS(settings.baseURL + "presentation/stylesheets/highvis-yo.css", "highvis-yo");
-			$('#sBarCSS').remove();
-			attachCSS(settings.baseURL + settings.stylesheetURL, "sBarCSS");
+			CSStoInline("#sbar");
 		});
 		
 		mbEventListener('sbApplyCSS-wb', "click", function(e){ 
 			attachCSS(settings.baseURL + "presentation/stylesheets/highvis-wb.css", "highvis-wb");
-			$('#sBarCSS').remove();
-			attachCSS(settings.baseURL + settings.stylesheetURL, "sBarCSS");
+			CSStoInline("#sbar");
+		});
+		
+		mbEventListener('sbApplyCSS-wbw', "click", function(e){
+			attachCSS(settings.baseURL + "presentation/stylesheets/highvis-bw.css", "highvis-wbw");
+			CSStoInline("#sbar");
 		});
 	}
 }
@@ -462,6 +566,9 @@ window.parseDictionaryResponse = function(input){
 	var output = output.replace(/(={2,})+(.*?)(?:={2,})+/ig, function(match, g1, g2, position, input) {
     	return "<h" + g1.length + ">" + g2 + "</h" + g1.length + ">";
     });
+    
+    // Remove comments
+    var output = output.replace(/(<!--.*?-->)/ig, '');
 	
 	// Replace bold / italics.
 	output = output.replace(/(('+){1}(.*?)(?:'+){1})/ig, function(match, g1, g2, g3, position, input){
@@ -791,9 +898,51 @@ window.startProcess = function(){
 		setTimeout('startProcess()', 100);
 	} else {
 		loadJQExtensions();
+		jQCopyCSS();
 		loadStudyBar();
 	}
 
+}
+
+function jQCopyCSS(){
+		// jQuery by default doesnt support returning all the attributes..
+		jQuery.fn.css2 = jQuery.fn.css;
+		jQuery.fn.css = function() {
+		    if (arguments.length) return jQuery.fn.css2.apply(this, arguments);
+		    
+		    var attr = ['font-family','font-size','font-weight','font-style','color',
+		        'text-transform','text-decoration','letter-spacing','word-spacing',
+		        'line-height','text-align','vertical-align','background-color',
+		        'background-image','background-repeat','background-position',
+		        'background-attachment','opacity','width','height','top','right','bottom',
+		        'left','margin-top','margin-right','margin-bottom','margin-left',
+		        'padding-top','padding-right','padding-bottom','padding-left',
+		        'border-top-width','border-right-width','border-bottom-width',
+		        'border-left-width','border-top-color','border-right-color',
+		        'border-bottom-color','border-left-color','border-top-style',
+		        'border-right-style','border-bottom-style','border-left-style','position',
+		        'display','visibility','z-index','overflow-x','overflow-y','white-space',
+		        'clip','float','clear','cursor','list-style-image','list-style-position',
+		        'list-style-type','marker-offset'];
+		        
+		    var len = attr.length, obj = {};
+
+			var tmpJson = "";
+
+		    for (var i = 0; i < len; i++){ 
+		    	var tmpVal = jQuery.fn.css2.call(this, attr[i]);
+		    	
+		    	if(tmpVal != 'undefined' && tmpVal != "0px" && tmpVal != "none" && tmpVal != "rgb(0, 0, 0)" && tmpVal != "0%" && tmpVal != "normal" && tmpVal != "auto"){
+		       		obj[attr[i]] = tmpVal;
+		       		//tmpJson += " '" + attr[i] + "' : '" + tmpVal + "',";
+		       		//console.log(attr[i] + ": " + tmpVal);
+		        }
+		    }
+		    
+		    //tmpJson = tmpJson.replace(/,$/, ' ');
+		    
+		    return obj;
+		}
 }
 
 // <Name> loadJQExtensions
@@ -839,11 +988,14 @@ if (window == window.top) {
 		
 		var thisIsBlocked = false;
 		
+		jQCopyCSS();
+		
 		if(disabledSites.length > 0){
 			for (var i=0; i<disabledSites.length; i++ ){
 				if(disabledSites[i] == window.location.hostname) thisIsBlocked = true;
 			}
 		}
+	
 	
 		if( autoLoadValue == true && thisIsBlocked == false ) {
 			$(document).ready(function(){
