@@ -30,7 +30,7 @@
 // @require       http://access.ecs.soton.ac.uk/seb/StudyBar/button.class.js
 // ==/UserScript==
 
-var versionString = "0.3.944 pre-beta";
+var versionString = "0.3.950 pre-beta";
 
 var includeScripts = [];
 
@@ -330,7 +330,7 @@ window.checkCSXHRTTSResponse = function(fullData, block, totalBlocks, reqID){
 			// Finished request..
 			jQuery.facebox.changeFaceboxContent( toolbarItems.TTS.dialogs.starting );
 			
-			ttsJobSent( RO );
+			window.ttsJobSent( RO );
 		} else {
 			// Send the next block.
 			if(RO.data.message == "ChunkSaved"){
@@ -348,7 +348,7 @@ window.ttsJobSent = function(response){
 	if(XHRMethod == "GM-XHR"){
 		var ro = eval("(" + response.responseText + ")");
 	} else {
-		var ro = eval("(" + response + ")");
+		var ro = response;
 	}
 	
 	if(ro.status == "encoding" && ro.status != "failure"){
@@ -356,7 +356,7 @@ window.ttsJobSent = function(response){
 			window.setTimeout(countdownTTS, 0, (ro.est_completion / ro.chunks), ro.ID );
 		} else {
 			setTimeout(function(){
-				countdownTTSCB( (ro.est_completion / ro.chunks), ro.ID );
+				window.countdownTTSCB( (ro.est_completion / ro.chunks), ro.ID );
 			}, 0);
 		}
 	} else if(ro.status == "failure" && ro.reason == "overcapacity"){
@@ -379,22 +379,29 @@ window.countdownTTSCB = function(tLeft, id){
 		setTimeout(function(){ playTTSCB(id) }, 0);
 	} else {
 		$('#sbttstimeremaining').html( tLeft + " seconds" );
-		window.setTimeout(countdownTTS, 1000, (tLeft - 1), id);
+		setTimeout(function(){ countdownTTSCB( (tLeft - 1), id ) }, 1000);
 	}
 }
 
 window.playTTSCB = function(id){
-	if(identifyBrowser() != "IE"){
+	/*if(identifyBrowser() != "IE"){
 		$('#sbar').append( $("<embed src=\"" + settings.baseURL + "TTS/player/player-licensed.swf\" width=\"200\" height=\"300\" allowscriptaccess=\"always\" allowfullscreen=\"false\" flashvars=\"file=" + settings.baseURL + "TTS/cache/" + id + ".xml&autostart=true&playlist=bottom&repeat=list\" />") );
 		$(document).trigger('close.facebox');
-	}
+	}*/
+	embedPlayer(id);
 }
 
 window.playTTS = function(){
-	if(identifyBrowser() != "IE"){
+	/*if(identifyBrowser() != "IE"){
 		$('#sbar').append( $("<embed src=\"" + settings.baseURL + "TTS/player/player-licensed.swf\" width=\"200\" height=\"300\" allowscriptaccess=\"always\" allowfullscreen=\"false\" flashvars=\"file=" + settings.baseURL + "TTS/cache/" + arguments[0] + ".xml&autostart=true&playlist=bottom&repeat=list\" />") );
 		$(document).trigger('close.facebox');
-	}
+	}*/
+	embedPlayer(arguments[0]);
+}
+
+window.embedPlayer = function(id){
+	$('#sbar').append( $("<OBJECT width=\"200\" height=\"300\"> <PARAM name=\"movie\" value=\"" + settings.baseURL + "TTS/player/player-licensed.swf\"></PARAM> <PARAM name=\"FlashVars\" value=\"file=" + settings.baseURL + "TTS/cache/" + id + ".xml&autostart=true&playlist=bottom&repeat=list\"><EMBED src=\"" + settings.baseURL + "TTS/player/player-licensed.swf\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"false\" flashvars=\"file=" + settings.baseURL + "TTS/cache/" + id + ".xml&autostart=true&playlist=bottom&repeat=list\" width=\"200\" height=\"300\"> </EMBED> </OBJECT>") );
+	$(document).trigger('close.facebox');
 }
 
 // <Name> spellCheckPage
