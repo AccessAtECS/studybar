@@ -30,7 +30,7 @@
 // @require       http://access.ecs.soton.ac.uk/seb/StudyBar/button.class.js
 // ==/UserScript==
 
-var versionString = "0.3.950 pre-beta";
+var versionString = "0.4.102 pre-beta";
 
 var includeScripts = [];
 
@@ -62,7 +62,12 @@ var toolbarItems = {
 					starting: "<h2>Text To Speech</h2> <center>Text to Speech conversion is taking place. <br /><img src='http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/loadingbig.gif' /><br />Time remaining: <div id='sbttstimeremaining'>calculating</div><br />Please wait... <center>"
 				}
 		},
-		references: { id: 'references', ico: 'book_link.png', act: 'alert(\'References is currently not implemented in this beta version.\')', tip: 'References', clickEnabled: true },
+		references: { id: 'references', ico: 'book_link.png', act: 'referencesDialog()', tip: 'References', clickEnabled: true,
+				dialogs: {
+					landingDialog: "<h2>References</h2> <p>You can use this function to find information on this page to make a reference.<br /><br />What type of material are you referencing?</p><select id=\"sbReferenceType\"> </select><br /><br /> <div class=\"sbarDialogButton\"><a id=\"sbScanReferences\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Scan Page</a></div>",
+					results: "<h2>Reference Scan Results</h2><p>Below are the results that we've found on this page.</p><br /> <table border=\"0\"><tr><td><b>Author:</b></td><td>{{author}}</td></tr><tr><td><b>Date:</b></td><td>{{date}}</td></tr><tr><td><b>Page Title:</b></td><td>{{ptitle}}</td></tr><tr><td><b>Name of Website:</b></td><td>{{wsname}}</td></tr><tr><td><b>Name of Webpage:</b></td><td>{{wpname}}</td></tr><tr><td><b>Accessed:</b></td><td>{{accessed}}</td></tr><tr><td><b>URL:</b></td><td>{{url}}</td></tr></table>"
+				}
+		},
 		dictionary: { id: 'dictionary', ico: 'book_open.png', act: 'getDictionaryRef()', tip: 'Dictionary', clickEnabled: true },
 		CSS: { id: 'changecss', ico: 'palette.png', act: 'changeColours(0)', tip: 'Change Styles', clickEnabled: true, 
 				dialogs: { 
@@ -273,7 +278,7 @@ window.startTTS = function(){
 		
 		var reqID = Math.floor(Math.random() * 5001);
 		
-		jQuery.facebox.changeFaceboxContent( "<h2>Processing</h2><p>Compacting and transmitting data...</p><div id='compactStatus'>0 / " + chunks + "</div>" );
+		jQuery.facebox.changeFaceboxContent( "<h2>Processing</h2><p>Compacting and transmitting data...<br /><div id='compactStatus'>0 / " + chunks + "</div></p>" );
 		
 		sendTTSChunk(transmitData, 1, chunks, reqID);
 		
@@ -322,8 +327,6 @@ window.checkCSXHRTTSResponse = function(fullData, block, totalBlocks, reqID){
 		// Remove the response JS.
 		$('#CS-XHR').remove();
 
-		//alert("Data from server: " + RO.data.message + ", Block " + block + " of " + totalBlocks);
-
 		$("#compactStatus").html(block + " / " + totalBlocks);
 
 		if(block == totalBlocks){
@@ -336,7 +339,7 @@ window.checkCSXHRTTSResponse = function(fullData, block, totalBlocks, reqID){
 			if(RO.data.message == "ChunkSaved"){
 				sendTTSChunk(fullData, (block + 1), totalBlocks, reqID);
 			} else {
-				jQuery.facebox.changeFaceboxContent("<h2>Error</h2><p>An error occured on the server. Please try again later.</p>");
+				jQuery.facebox.changeFaceboxContent("<h2>Error</h2><p>An error occurred on the server. Please try again later.</p>");
 			}
 		}
 
@@ -384,18 +387,10 @@ window.countdownTTSCB = function(tLeft, id){
 }
 
 window.playTTSCB = function(id){
-	/*if(identifyBrowser() != "IE"){
-		$('#sbar').append( $("<embed src=\"" + settings.baseURL + "TTS/player/player-licensed.swf\" width=\"200\" height=\"300\" allowscriptaccess=\"always\" allowfullscreen=\"false\" flashvars=\"file=" + settings.baseURL + "TTS/cache/" + id + ".xml&autostart=true&playlist=bottom&repeat=list\" />") );
-		$(document).trigger('close.facebox');
-	}*/
 	embedPlayer(id);
 }
 
 window.playTTS = function(){
-	/*if(identifyBrowser() != "IE"){
-		$('#sbar').append( $("<embed src=\"" + settings.baseURL + "TTS/player/player-licensed.swf\" width=\"200\" height=\"300\" allowscriptaccess=\"always\" allowfullscreen=\"false\" flashvars=\"file=" + settings.baseURL + "TTS/cache/" + arguments[0] + ".xml&autostart=true&playlist=bottom&repeat=list\" />") );
-		$(document).trigger('close.facebox');
-	}*/
 	embedPlayer(arguments[0]);
 }
 
@@ -677,6 +672,105 @@ window.fontSettingsDialog = function(){
 }
 
 
+window.referencesDialog = function(){
+	var htmlData = toolbarItems.references.dialogs.landingDialog;
+	var url = String(window.location);
+	
+	var options = "<option>Webpage</option>";
+	
+	if( url.match("wiki") != null ) alert("Warning: This source may not be suitable for academic writing.");
+
+	
+	if( url.match("news") != null){
+		// This may be a news site.
+		options += "<option selected=\"selected\">News Article</option>";	
+	} else {
+		options += "<option>News Article</option>";
+	}
+	
+	htmlData = htmlData.replace(/(<select id=\"sbReferenceType\">)(\s)(<\/select>)/ig, "$1" + options + "$3");
+	
+	jQuery.facebox( htmlData );
+
+	mbEventListener('sbScanReferences', 'click', function(e){ scanForReferenceMaterial( $('#sbReferenceType').val() ); } );
+
+}
+
+window.scanForReferenceMaterial = function(type){
+
+	var emptySelect = "<select id=\"{{id}}\">{{data}}</select>";
+	var outputHTML = toolbarItems.references.dialogs.results;
+	var bodyString = $('body').html();
+
+	// Author
+	
+		// Individual? 
+		//By[ :]?([a-zA-Z]{3,}(?:[\s]?[a-zA-Z]{3,}))[.*?]?
+		var authMatch = bodyString.match(/By[:]?[\s]{1,}(?:([a-zA-Z]{3,}(?:[\s]?[a-zA-Z]{3,}))|(?:(?:<.*?>)([a-zA-Z]{3,}(?:[\s]?[a-zA-Z]{3,}))(?:<.*?>)))/ig);
+		
+		if(authMatch == null) {
+			// Corporate author, maybe?
+			outputHTML = outputHTML.replace('{{author}}', "");
+		} else {
+			
+			var uniqueMatches = authMatch.unique();
+			
+			if(authMatch.length == 1){
+				outputHTML = outputHTML.replace('{{author}}', uniqueMatches.replace(/(By[:]?[\s]{1,})/ig, ''));
+			} else {
+				// Multiple matches found.
+				
+				var matchOptions = "";
+				
+				for(i = 0; i < uniqueMatches.length; i++){
+					var thisMatch = uniqueMatches[i];
+					matchOptions += "<option>" + thisMatch.replace(/(By[:]?[\s]{1,})/ig, '') + "</option>";
+				}
+				
+				var authorSelect = emptySelect.replace("{{data}}", matchOptions);
+				authorSelect = authorSelect.replace("{{id}}", "sbAuthorSelect");
+				
+				authorSelect += " <a id=\"sbAuthorSelectAccept\"><img src=\"" + settings.baseURL + "/presentation/images/accept.png\" /></a>"
+				
+				outputHTML = outputHTML.replace('{{author}}', authorSelect);
+			}
+		}
+	
+	// Page Title
+
+		
+
+
+	// Name of webpage
+	
+	// Name of website
+	
+	
+	
+	outputHTML = outputHTML.replace( "{{url}}", window.location );
+	outputHTML = outputHTML.replace( "{{accessed}}", Date() );
+	
+	jQuery.facebox.changeFaceboxContent( outputHTML );
+	
+	
+	
+	// Run select box listener attachments.
+	if(uniqueMatches != null) {
+		if(uniqueMatches.length > 1){
+			$('#sbAuthorSelect').bind('change', function(e){
+				$('#sbAuthorSelect').replaceWith( $('#sbAuthorSelect').val() );
+				$('#sbAuthorSelectAccept').remove();
+			});
+			
+			$('#sbAuthorSelectAccept').bind('click', function(e){
+				$('#sbAuthorSelect').replaceWith( $('#sbAuthorSelect').val() );
+				$('#sbAuthorSelectAccept').remove();
+			});
+		}
+	}
+
+}
+
 // <Name> settingsDialog
 // <Purpose> Load the settings dialog.
 
@@ -792,6 +886,16 @@ window.createIEaddEventListeners = function(){
     }
 }
 	
+Array.prototype.unique = function () {
+	var r = new Array();
+	o:for(var i = 0, n = this.length; i < n; i++){
+		for(var x = 0, y = r.length; x < y; x++){
+			if(r[x]==this[i]) continue o;
+		}
+		r[r.length] = this[i];
+	}
+	return r;
+}
 
 window.b64 = function(input) {
 	// + == _
