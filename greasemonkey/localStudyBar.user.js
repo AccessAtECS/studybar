@@ -143,6 +143,8 @@ window.loadStudyBar = function(){
 		}
 	}
 	$("#sbarlogo").bind("click", function(e){ jQuery.facebox( settings.aboutBox ); });
+	
+	checkUpdate();
 }
 
 
@@ -169,6 +171,31 @@ window.attachJS = function(url, id){
 	javascriptFile.type = "text/javascript";
 	javascriptFile.id = id;
 	head.appendChild(javascriptFile);	
+}
+
+
+window.checkUpdate = function(){
+
+	if(XHRMethod == "GM-XHR"){
+		GM_xmlhttpRequest({ method: "GET",
+				url: settings.baseURL + "update.php", 
+				onload: updatecheckResult,
+			});	
+	
+	} else {
+	
+	}
+
+}
+
+window.updatecheckResult = function(response){
+	if(XHRMethod == "GM-XHR"){
+		var ro = eval("(" + response.responseText + ")");
+	} else {
+		var ro = response;
+	}
+	
+	alert(ro.ver);
 }
 
 /////////////////////////////////////////////////
