@@ -1,5 +1,4 @@
 // StudyBar Greasemonkey script
-// version 0.1 BETA!
 // 2009-07-10
 // Released under the GPL license
 // http://www.gnu.org/copyleft/gpl.html
@@ -30,7 +29,7 @@
 // @require       http://access.ecs.soton.ac.uk/seb/StudyBar/button.class.js
 // ==/UserScript==
 
-var versionString = "0.4.102 pre-beta";
+var versionString = "0.4.110";
 
 var includeScripts = [];
 
@@ -41,9 +40,10 @@ var originalPageSettings = { fontsize: "" };
 var settings = {
 				stylesheetURL: "presentation/style.css",
 				baseURL: "http://access.ecs.soton.ac.uk/seb/StudyBar/",
-				aboutBox: "<h2>About StudyBar</h2>Version " + versionString + "<br /><br />Created by Sebastian Skuse under supervision of Mike Wald<br />Learning Societies Lab<br /> &copy; University of Southampton 2009.<br />Icons &copy; {{PLACEHOLDER}} under CC licence.",
+				aboutBox: "<h2>About StudyBar</h2>Version " + versionString + " pre-beta<br /><br />Created by Sebastian Skuse under supervision of Mike Wald<br />Learning Societies Lab<br /> &copy; University of Southampton 2009.<br />Icons &copy; {{PLACEHOLDER}} under CC licence.",
 				textSizeLevel: 1,
-				ttsSplitChunkSize: 700
+				ttsSplitChunkSize: 700,
+				invoked: "false"
 				};
 
 
@@ -102,49 +102,53 @@ var head = document.getElementsByTagName('head')[0];
 // <ToDo> Nothing.
 
 window.loadStudyBar = function(){
-	doc = document;
-	head = document.getElementsByTagName('head')[0]; 
-	
-	// Set the method of XHR that we're going to use.
-	setXHRMethod();
-	
-	// Attatch our new stylesheet.
-	attachCSS(settings.baseURL + settings.stylesheetURL, "sBarCSS");
-	
-	// Create the div for StudyBar.
-	bar = doc.createElement('div');
-	// Set the ID of the toolbar.
-	bar.id = "sbar";
-	
-	// Insert it as the first node in the body node.
-	doc.body.insertBefore(bar, doc.body.firstChild);
-	
-	// Add logo to studybar.
-	$("<a id=\"sbarlogo\"><img src=\"" + settings.baseURL +  "presentation/images/logo.png\" align=\"left\" border=\"0\" style=\"margin-top:6px; float:left !important;\" /></a>").appendTo('#sbar');
-	
-	// Add items to the toolbar.
-	populateBar();
-	
-	// Save current page settings, so we can reset them later if we need to!
-	originalPageSettings.fontsize = document.body.style.fontSize;
-	
-	if( (typeof GM_setValue) == 'undefined' ) {
-	
-	} else {
-		// Set studybar to load next time we load a page.
-		GM_setValue('autoload', true);
+	if(settings.invoked == "false"){
+		doc = document;
+		head = document.getElementsByTagName('head')[0]; 
 		
-		if(identifyBrowser() != 'Opera' && identifyBrowser() != 'IE') {		
-			if(disabledSites.length > 0){
-				for (var i=0; i<disabledSites.length; i++ ){
-					if(disabledSites[i] == window.location.hostname) delete disabledSites[i];
+		// Set the method of XHR that we're going to use.
+		setXHRMethod();
+		
+		
+		
+		// Create the div for StudyBar.
+		bar = doc.createElement('div');
+		// Set the ID of the toolbar.
+		bar.id = "sbar";
+		
+		// Insert it as the first node in the body node.
+		$(bar).insertAfter("#sbarGhost");
+		
+		// Add logo to studybar.
+		$("<a id=\"sbarlogo\"><img src=\"" + settings.baseURL +  "presentation/images/logo.png\" align=\"left\" border=\"0\" style=\"margin-top:6px; float:left !important;\" /></a>").appendTo('#sbar');
+		
+		// Add items to the toolbar.
+		populateBar();
+		
+		// Save current page settings, so we can reset them later if we need to!
+		originalPageSettings.fontsize = document.body.style.fontSize;
+		
+		if( (typeof GM_setValue) == 'undefined' ) {
+		
+		} else {
+			// Set studybar to load next time we load a page.
+			GM_setValue('autoload', true);
+			
+			if(identifyBrowser() != 'Opera' && identifyBrowser() != 'IE') {		
+				if(disabledSites.length > 0){
+					for (var i=0; i<disabledSites.length; i++ ){
+						if(disabledSites[i] == window.location.hostname) delete disabledSites[i];
+					}
 				}
 			}
 		}
-	}
-	$("#sbarlogo").bind("click", function(e){ jQuery.facebox( settings.aboutBox ); });
+		$("#sbarlogo").bind("click", function(e){ jQuery.facebox( settings.aboutBox ); });
 	
-	checkUpdate();
+	
+		checkUpdate();
+		settings.invoked = "true";
+		//$('#sbarGhost').html();
+	}
 }
 
 
@@ -175,7 +179,6 @@ window.attachJS = function(url, id){
 
 
 window.checkUpdate = function(){
-
 	if(XHRMethod == "GM-XHR"){
 		GM_xmlhttpRequest({ method: "GET",
 				url: settings.baseURL + "update.php", 
@@ -191,11 +194,20 @@ window.checkUpdate = function(){
 window.updatecheckResult = function(response){
 	if(XHRMethod == "GM-XHR"){
 		var ro = eval("(" + response.responseText + ")");
-	} else {
-		var ro = response;
+		
+		var serverVer = ro.ver;
+		var thisVer = versionString;
+		
+		serverVer = serverVer.replace(/[.]/g, '');
+		thisVer = thisVer.replace(/[.]/g, '');
+		
+		if(serverVer > thisVer){
+			alert("StudyBar Version " + ro.ver + " is available! You have " + versionString + ". You will now be prompted to install the new version.");
+			window.location = ro.updateURL;
+		} else {
+
+		}
 	}
-	
-	alert(ro.ver);
 }
 
 /////////////////////////////////////////////////
@@ -493,20 +505,28 @@ window.changeColours = function(level){
 	if(level == 3){
 		jQuery.facebox.changeFaceboxContent( toolbarItems.CSS.dialogs.sbAttachCSS );
 		mbEventListener('sbApplyCSS-yb', "click", function(e){ 
-			attachCSS(settings.baseURL + "presentation/stylesheets/highvis-yo.css", "highvis-yo");
 			CSStoInline("#sbar");
+			removeCSS();
+			attachCSS(settings.baseURL + "presentation/stylesheets/highvis-yo.css", "highvis-yo");
 		});
 		
 		mbEventListener('sbApplyCSS-wb', "click", function(e){ 
-			attachCSS(settings.baseURL + "presentation/stylesheets/highvis-wb.css", "highvis-wb");
 			CSStoInline("#sbar");
+			removeCSS();
+			attachCSS(settings.baseURL + "presentation/stylesheets/highvis-wb.css", "highvis-wb");
+			
 		});
 		
 		mbEventListener('sbApplyCSS-wbw', "click", function(e){
-			attachCSS(settings.baseURL + "presentation/stylesheets/highvis-bw.css", "highvis-wbw");
 			CSStoInline("#sbar");
+			removeCSS();
+			attachCSS(settings.baseURL + "presentation/stylesheets/highvis-bw.css", "highvis-wbw");
 		});
 	}
+}
+
+window.removeCSS = function(){
+	$('link[rel=stylesheet][id!=sBarCSS]').remove();
 }
 
 
@@ -691,7 +711,7 @@ window.fontSettingsDialog = function(){
 	jQuery.facebox( toolbarItems.fontSettings.dialogs.main );
 	mbEventListener('sbfontfaceapply', 'click', function(e){
 		if($('#sbfontface').val() != "--Site Specific--") $('body').css('font-family', $('#sbfontface').val());
-		$('div').css('line-height', $('#sblinespacing').val() + "%");
+		$('div[class!=sbarDialogButton]').css('line-height', $('#sblinespacing').val() + "%");
 		$('#sbar').css('line-height', '0%');
 		//$('#sbar').nextAll()
 	});
@@ -1093,6 +1113,20 @@ window.loadJQExtensions = function(){
 	attachJS( settings.baseURL + 'jquery.facebox.js', 'sb-facebox' );
 }
 
+function bootstrap(){
+	var sheets = document.styleSheets;
+
+	/*for(var x = 0; x < sheets.length; x++){
+		if(sheets[x].ownerNode.id == "sBarCSS"){
+			loadStudyBar();
+			return;
+		}
+	}
+	setTimeout(bootstrap(), 200);
+	*/
+	loadStudyBar();
+}
+
 ///////////////////////////////////////////////////////////////////////////
 
 // Are we loading in an iframe?
@@ -1137,7 +1171,19 @@ if (window == window.top) {
 	
 		if( autoLoadValue == true && thisIsBlocked == false ) {
 			$(document).ready(function(){
-				loadStudyBar();
+				// Attatch our new stylesheet.
+				attachCSS(settings.baseURL + settings.stylesheetURL, "sBarCSS");
+		
+				// Create the div for the StudyBar ghost.
+				barGhost = document.createElement('div');
+				// Set the ID of the toolbar.
+				barGhost.id = "sbarGhost";
+				barGhost.innerHTML = "<center><img src=\"" + settings.baseURL + "presentation/images/loading.gif\" style=\"margin-top:10px;\" /></center>";
+				
+				// Insert it as the first node in the body node.
+				document.body.insertBefore(barGhost, document.body.firstChild);
+			
+				bootstrap();
 			});
 		}
 	
