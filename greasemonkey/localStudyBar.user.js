@@ -29,7 +29,7 @@
 // @require       http://access.ecs.soton.ac.uk/seb/StudyBar/button.class.js
 // ==/UserScript==
 
-var versionString = "0.4.114";
+var versionString = "0.4.240";
 
 var includeScripts = [];
 
@@ -56,6 +56,7 @@ var toolbarItems = {
 				}
 		},
 		spell: { id: 'spell', ico: 'spell-off.png', act: 'spellCheckPage()', tip: 'Start / Stop spellchecker', clickEnabled: true, checkerEnabled: false },
+		dictionary: { id: 'dictionary', ico: 'book_open.png', act: 'getDictionaryRef()', tip: 'Dictionary', clickEnabled: true },
 		TTS: { id: 'tts', ico: 'sound.png', act: 'ttsOptions()', tip: 'Text to Speech options', clickEnabled: true, positition: "", playingItem: "",
 				dialogs: {
 					options: "<h2>Text to Speech options</h2> <div class=\"sbarDialogButton\"> <a id=\"sbStartTTS\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Get Text-To-Speech for this page</a></div>",
@@ -68,10 +69,9 @@ var toolbarItems = {
 		references: { id: 'references', ico: 'book_link.png', act: 'referencesDialog()', tip: 'References', clickEnabled: true,
 				dialogs: {
 					landingDialog: "<h2>References</h2> <p>You can use this function to find information on this page to make a reference.<br /><br />What type of material are you referencing?</p><select id=\"sbReferenceType\"> </select><br /><br /> <div class=\"sbarDialogButton\"><a id=\"sbScanReferences\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Scan Page</a></div>",
-					results: "<h2>Reference Scan Results</h2><p>Below are the results that we've found on this page.</p><br /> <table border=\"0\"><tr><td><b>Author:</b></td><td>{{author}}</td></tr><tr><td><b>Date:</b></td><td>{{date}}</td></tr><tr><td><b>Page Title:</b></td><td>{{ptitle}}</td></tr><tr><td><b>Name of Website:</b></td><td>{{wsname}}</td></tr><tr><td><b>Name of Webpage:</b></td><td>{{wpname}}</td></tr><tr><td><b>Accessed:</b></td><td>{{accessed}}</td></tr><tr><td><b>URL:</b></td><td>{{url}}</td></tr></table>"
+					results: "<h2>Reference Scan Results</h2><p>Below are the results that we've found on this page.</p><br /> <table border=\"0\"><tr><td><b>Author:</b></td><td>{{author}}</td></tr><tr><td><b>Date:</b></td><td>{{date}}</td></tr><tr><td><b>Page Title:</b></td><td>{{ptitle}}</td></tr><tr><td><b>Name of Website:</b></td><td>{{wsname}}</td></tr><tr><td><b>Accessed:</b></td><td>{{accessed}}</td></tr><tr><td><b>URL:</b></td><td>{{url}}</td></tr></table>"
 				}
 		},
-		dictionary: { id: 'dictionary', ico: 'book_open.png', act: 'getDictionaryRef()', tip: 'Dictionary', clickEnabled: true },
 		CSS: { id: 'changecss', ico: 'palette.png', act: 'changeColours(0)', tip: 'Change Styles', clickEnabled: true, 
 				dialogs: { 
 					colourDialog: "<h2>Change Colour settings</h2> <div class=\"sbarDialogButton\"> <a id=\"sbColourChange\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Change StudyBar Colour</a></div> <div class=\"sbarDialogButton\"><a id=\"sbChangeSiteColours\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Change Site Colours</a></div> <div class=\"sbarDialogButton\"><a id=\"sbAttachCSSStyle\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Premade page styles</a></div>",
@@ -494,7 +494,7 @@ unsafeWindow.playerReady = function(obj) {
 	insertTTSControlBox(obj);
 	unsafeWindow.document["audioe"].addModelListener("STATE", "SBAudioStateListener");
 	unsafeWindow.document["audioe"].addModelListener("TIME", "SBAudioTimeMonitor");
-	unsafeWindow.document["audioe"].addControllerListener("ITEM", "SBAudioItemMonitor");
+	unsafeWindow.document["audioe"].addViewListener("ITEM", "SBAudioItemMonitor");
 }
 
 
@@ -845,38 +845,86 @@ window.scanForReferenceMaterial = function(type){
 			outputHTML = outputHTML.replace('{{author}}', "");
 		} else {
 			
-			var uniqueMatches = authMatch.unique();
+			var authorUniqueMatches = authMatch.unique();
 			
 			if(authMatch.length == 1){
-				outputHTML = outputHTML.replace('{{author}}', uniqueMatches.replace(/(By[:]?[\s]{1,})/ig, ''));
+				outputHTML = outputHTML.replace('{{author}}', authorUniqueMatches.replace(/(By[:]?[\s]{1,})/ig, ''));
 			} else {
 				// Multiple matches found.
 				
 				var matchOptions = "";
 				
-				for(i = 0; i < uniqueMatches.length; i++){
-					var thisMatch = uniqueMatches[i];
+				for(i = 0; i < authorUniqueMatches.length; i++){
+					var thisMatch = authorUniqueMatches[i];
 					matchOptions += "<option>" + thisMatch.replace(/(By[:]?[\s]{1,})/ig, '') + "</option>";
 				}
 				
 				var authorSelect = emptySelect.replace("{{data}}", matchOptions);
 				authorSelect = authorSelect.replace("{{id}}", "sbAuthorSelect");
 				
-				authorSelect += " <a id=\"sbAuthorSelectAccept\"><img src=\"" + settings.baseURL + "/presentation/images/accept.png\" /></a>"
+				authorSelect += " <a id=\"sbAuthorSelectAccept\"><img src=\"" + settings.baseURL + "/presentation/images/accept.png\" /></a>";
 				
 				outputHTML = outputHTML.replace('{{author}}', authorSelect);
 			}
 		}
 	
 	// Page Title
-
+	var titleMatch = bodyString.match(/(?:<h[1-2]>[\s]?(.*?)[\s]?<\/h[1-2]>)/igm);
+	
+	if(titleMatch == null){
+		outputHTML = outputHTML.replace("{{ptitle}}", document.title);
+	} else {
+		var titleUniqueMatches = titleMatch.unique();
 		
+		var matchOptions = "<option>" + document.title + "</option>";
+		
+		for(i = 0; i < titleUniqueMatches.length; i++){
+			var thisMatch = titleUniqueMatches[i];
+			if(thisMatch != "References") matchOptions += "<option>" + thisMatch + "</option>";
+		}
+		
+		var titleSelect = emptySelect.replace("{{data}}", matchOptions);
+		titleSelect = titleSelect.replace("{{id}}", "sbTitleSelect");
+		
+		titleSelect += " <a id=\"sbTitleSelectAccept\"><img src=\"" + settings.baseURL + "/presentation/images/accept.png\" /></a>";
+		
+		outputHTML = outputHTML.replace("{{ptitle}}", titleSelect);
+	}
+	
+	
+	// Date
+	var dateMatch = bodyString.match(/(([\w]{3,8} [\d]{1,2}[,]? [\d]{4})|([0-3][0-9]\/[0-3][0-9]\/[\d]{2,4})|([\d]{2} [\w]{3,8} [\d]{4}))/ig);
+	
+	if(dateMatch == null){
+		outputHTML = outputHTML.replace("{{date}}", "");
+	} else {
+		var dateUniqueMatches = dateMatch.unique();
+	
+		if(dateUniqueMatches.length == 1){
+			outputHTML = outputHTML.replace("{{date}}", dateUniqueMatches);
+		} else {
+			var matchOptions = "";
+			
+			for(i = 0; i < dateUniqueMatches.length; i++){
+				var thisMatch = dateUniqueMatches[i];
+				matchOptions += "<option>" + thisMatch + "</option>";
+			}
+			
+			var dateSelect = emptySelect.replace("{{data}}", matchOptions);
+			dateSelect = dateSelect.replace("{{id}}", "sbDateSelect");
+			
+			dateSelect += " <a id=\"sbDateSelectAccept\"><img src=\"" + settings.baseURL + "/presentation/images/accept.png\" /></a>";
+			
+			outputHTML = outputHTML.replace('{{date}}', dateSelect);
+		}
+	}
 
-
-	// Name of webpage
 	
 	// Name of website
+	var thisDomain = document.domain;
+	thisDomain = thisDomain.match(/\.([\w]{3,}\.[\w].*){1}$/);	
 	
+	outputHTML = outputHTML.replace("{{wsname}}", thisDomain[1]);
 	
 	
 	outputHTML = outputHTML.replace( "{{url}}", window.location );
@@ -887,8 +935,8 @@ window.scanForReferenceMaterial = function(type){
 	
 	
 	// Run select box listener attachments.
-	if(uniqueMatches != null) {
-		if(uniqueMatches.length > 1){
+	if(authorUniqueMatches != null) {
+		if(authorUniqueMatches.length > 1){
 			$('#sbAuthorSelect').bind('change', function(e){
 				$('#sbAuthorSelect').replaceWith( $('#sbAuthorSelect').val() );
 				$('#sbAuthorSelectAccept').remove();
@@ -897,6 +945,34 @@ window.scanForReferenceMaterial = function(type){
 			$('#sbAuthorSelectAccept').bind('click', function(e){
 				$('#sbAuthorSelect').replaceWith( $('#sbAuthorSelect').val() );
 				$('#sbAuthorSelectAccept').remove();
+			});
+		}
+	}
+	
+	if(titleUniqueMatches != null) {
+		if(titleUniqueMatches.length > 1){
+			$('#sbTitleSelect').bind('change', function(e){
+				$('#sbTitleSelect').replaceWith( $('#sbTitleSelect').val() );
+				$('#sbTitleSelectAccept').remove();
+			});
+			
+			$('#sbTitleSelectAccept').bind('click', function(e){
+				$('#sbTitleSelect').replaceWith( $('#sbTitleSelect').val() );
+				$('#sbTitleSelectAccept').remove();
+			});
+		}
+	}
+
+	if(dateUniqueMatches != null) {
+		if(dateUniqueMatches.length > 1){
+			$('#sbDateSelect').bind('change', function(e){
+				$('#sbDateSelect').replaceWith( $('#sbDateSelect').val() );
+				$('#sbDateSelectAccept').remove();
+			});
+			
+			$('#sbDateSelectAccept').bind('click', function(e){
+				$('#sbDateSelect').replaceWith( $('#sbDateSelect').val() );
+				$('#sbDateSelectAccept').remove();
 			});
 		}
 	}
@@ -1091,7 +1167,6 @@ window.utf8_encode = function(string) {
 
 	return utftext;
 }
-
 
 
 // <Name> mbEventListener
