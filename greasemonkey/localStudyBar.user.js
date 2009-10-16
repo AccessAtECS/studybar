@@ -29,7 +29,7 @@
 // @require       http://access.ecs.soton.ac.uk/seb/StudyBar/button.class.js
 // ==/UserScript==
 
-var versionString = "0.4.110";
+var versionString = "0.4.114";
 
 var includeScripts = [];
 
@@ -56,10 +56,13 @@ var toolbarItems = {
 				}
 		},
 		spell: { id: 'spell', ico: 'spell-off.png', act: 'spellCheckPage()', tip: 'Start / Stop spellchecker', clickEnabled: true, checkerEnabled: false },
-		TTS: { id: 'tts', ico: 'sound.png', act: 'ttsOptions()', tip: 'Text to Speech options', clickEnabled: true,
+		TTS: { id: 'tts', ico: 'sound.png', act: 'ttsOptions()', tip: 'Text to Speech options', clickEnabled: true, positition: "", playingItem: "",
 				dialogs: {
 					options: "<h2>Text to Speech options</h2> <div class=\"sbarDialogButton\"> <a id=\"sbStartTTS\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Get Text-To-Speech for this page</a></div>",
 					starting: "<h2>Text To Speech</h2> <center>Text to Speech conversion is taking place. <br /><img src='http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/loadingbig.gif' /><br />Time remaining: <div id='sbttstimeremaining'>calculating</div><br />Please wait... <center>"
+				},
+				extendedButtons: {
+					controlBox: "<div id=\"sbAudioControlBox\"> <div id=\"sb-btn-plpaus\" class=\"sb-btn\"><a title=\"Play / Pause\" id=\"sb-tts-plpaus\"><img id=\"sb-btnico-plpaus\" src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/control-pause.png\" border=\"0\" /></a></div> <div id=\"sb-btn-rwd\" class=\"sb-btn\"><a title=\"Rewind\" id=\"sb-tts-rwd\"><img id=\"sb-btnico-rwd\" src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/control-stop-180.png\" border=\"0\" /></a></div> <div id=\"sb-btn-stop\" class=\"sb-btn\"><a title=\"Stop\" id=\"sb-tts-stop\"><img id=\"sb-btnico-stop\" src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/control-stop-square.png\" border=\"0\" /></a></div> </div>"
 				}
 		},
 		references: { id: 'references', ico: 'book_link.png', act: 'referencesDialog()', tip: 'References', clickEnabled: true,
@@ -95,6 +98,8 @@ var buttons = {};
 
 var XHRMethod;
 
+var jwPlayer;
+
 var head = document.getElementsByTagName('head')[0];
 
 // <Name> loadStudyBar
@@ -108,8 +113,6 @@ window.loadStudyBar = function(){
 		
 		// Set the method of XHR that we're going to use.
 		setXHRMethod();
-		
-		
 		
 		// Create the div for StudyBar.
 		bar = doc.createElement('div');
@@ -142,10 +145,12 @@ window.loadStudyBar = function(){
 				}
 			}
 		}
-		$("#sbarlogo").bind("click", function(e){ jQuery.facebox( settings.aboutBox ); });
+		$("#sbarlogo").bind("click", function(e){ 
+			jQuery.facebox( settings.aboutBox );
+			setTimeout(function(){ checkUpdate(); }, 500);
+		});
 	
 	
-		checkUpdate();
 		settings.invoked = "true";
 		//$('#sbarGhost').html();
 	}
@@ -291,6 +296,7 @@ window.startTTS = function(){
 	var $sendData = $(document.body).clone();
 	
 	$sendData.children('#sbar').remove();
+	$sendData.children('#sbarGhost').remove();
 	$sendData.children('#facebox').remove();
 	$sendData.children('script').remove();
 	$sendData.children('style').remove();
@@ -434,9 +440,88 @@ window.playTTS = function(){
 }
 
 window.embedPlayer = function(id){
-	$('#sbar').append( $("<OBJECT width=\"200\" height=\"300\"> <PARAM name=\"movie\" value=\"" + settings.baseURL + "TTS/player/player-licensed.swf\"></PARAM> <PARAM name=\"FlashVars\" value=\"file=" + settings.baseURL + "TTS/cache/" + id + ".xml&autostart=true&playlist=bottom&repeat=list\"><EMBED src=\"" + settings.baseURL + "TTS/player/player-licensed.swf\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"false\" flashvars=\"file=" + settings.baseURL + "TTS/cache/" + id + ".xml&autostart=true&playlist=bottom&repeat=list\" width=\"200\" height=\"300\"> </EMBED> </OBJECT>") );
+
+	//$('#sbar').append($("<embed src=\"" + settings.baseURL + "TTS/player/player-licensed.swf\" width=\"300\" height=\"300\" allowscriptaccess=\"always\" allowfullscreen=\"false\" flashvars=\"file=" + settings.baseURL + "TTS/cache/" + id + ".xml&autostart=true&playlist=bottom&repeat=list\" />") );
+	$('#sbar').append( $("<OBJECT width=\"1\" height=\"1\" id=\"audioo\" name=\"audioo\"> <PARAM name=\"movie\" value=\"" + settings.baseURL + "TTS/player/player-licensed.swf\"></PARAM> <PARAM name=\"flashvars\" value=\"file=" + settings.baseURL + "TTS/cache/" + id + ".xml&autostart=true&playlist=bottom&repeat=list\"><embed src=\"" + settings.baseURL + "TTS/player/player-licensed.swf\" width=\"1\" height=\"1\" allowscriptaccess=\"always\" allowfullscreen=\"false\" flashvars=\"file=" + settings.baseURL + "TTS/cache/" + id + ".xml&autostart=true&playlist=bottom&repeat=list\" id=\"audioe\" name=\"audioe\" /> </OBJECT>") );
 	$(document).trigger('close.facebox');
 }
+
+window.insertTTSControlBox = function(player){
+	$("#sb-btn-tts").after( toolbarItems.TTS.extendedButtons.controlBox );
+	toolbarItems.TTS.position = 0;
+	toolbarItems.TTS.playingItem = 0;
+
+
+	
+	$('#sb-tts-plpaus').tipsy({gravity: 'n'});
+	$('#sb-tts-stop').tipsy({gravity: 'n'});
+	$('#sb-tts-rwd').tipsy({gravity: 'n'});
+	
+	mbEventListener('sb-tts-plpaus', 'click', function(e){
+		unsafeWindow.document["audioe"].sendEvent('play'); 
+	});
+	
+	mbEventListener('sb-tts-rwd', 'click', function(e){
+		var scrubAmount = 2;
+		var currentPosition = toolbarItems.TTS.position;
+		var newPosition = (currentPosition - scrubAmount);
+		if(newPosition < 0) newPosition = 0;
+
+		unsafeWindow.document["audioe"].sendEvent('seek', newPosition); 
+	});
+	
+	mbEventListener('sb-tts-stop', 'click', function(e){
+		unsafeWindow.document["audioe"].sendEvent('stop'); 
+		
+		$("#sbar #sbAudioControlBox").animate({ 
+	        marginRight: "0px",
+			marginLeft: "0px",
+			width: "0px"
+      	}, 1500, '', removeControlBox() );
+
+	});
+}
+
+
+window.removeControlBox = function(){
+      	$("#sbar #sbAudioControlBox").remove();
+      	$("#audioo").remove();
+      	$(".tipsy").remove();
+}
+
+unsafeWindow.playerReady = function(obj) {
+	//if()
+	insertTTSControlBox(obj);
+	unsafeWindow.document["audioe"].addModelListener("STATE", "SBAudioStateListener");
+	unsafeWindow.document["audioe"].addModelListener("TIME", "SBAudioTimeMonitor");
+	unsafeWindow.document["audioe"].addControllerListener("ITEM", "SBAudioItemMonitor");
+}
+
+
+unsafeWindow.SBAudioTimeMonitor = function(obj){
+	toolbarItems.TTS.position = obj.position;
+}
+
+unsafeWindow.SBAudioItemMonitor = function(obj){
+	toolbarItems.TTS.playingItem = obj.item;
+}
+
+
+unsafeWindow.SBAudioStateListener = function(obj) {
+	var state = obj.newstate;
+	
+	// This isnt working yet.
+	if(state == "COMPLETED" && toolbarItems.TTS.playingItem == unsafeWindow.document['audioe'].getPlaylist().length){
+		alert('completed');
+	}
+	
+	if(state == "IDLE" || state == "PAUSED") {
+		$('#sb-btnico-plpaus').attr('src', settings.baseURL + "presentation/images/control.png");
+	} else {
+		$('#sb-btnico-plpaus').attr('src', settings.baseURL + "presentation/images/control-pause.png");
+	}	
+}
+
 
 // <Name> spellCheckPage
 // <Purpose> Invoke the modified jQuery spellchecking engine that we're using. Hook onto all textarea and text fields.
@@ -1057,7 +1142,8 @@ window.startProcess = function(){
 	} else {
 		loadJQExtensions();
 		jQCopyCSS();
-		loadStudyBar();
+		
+		bootstrap();
 	}
 
 }
@@ -1114,16 +1200,18 @@ window.loadJQExtensions = function(){
 }
 
 function bootstrap(){
-	var sheets = document.styleSheets;
+	// Attatch our new stylesheet.
+	attachCSS(settings.baseURL + settings.stylesheetURL, "sBarCSS");
 
-	/*for(var x = 0; x < sheets.length; x++){
-		if(sheets[x].ownerNode.id == "sBarCSS"){
-			loadStudyBar();
-			return;
-		}
-	}
-	setTimeout(bootstrap(), 200);
-	*/
+	// Create the div for the StudyBar ghost.
+	barGhost = document.createElement('div');
+	// Set the ID of the toolbar.
+	barGhost.id = "sbarGhost";
+	barGhost.innerHTML = "<center><img src=\"" + settings.baseURL + "presentation/images/loading.gif\" style=\"margin-top:10px;\" /></center>";
+	
+	// Insert it as the first node in the body node.
+	document.body.insertBefore(barGhost, document.body.firstChild);
+	
 	loadStudyBar();
 }
 
@@ -1135,7 +1223,7 @@ if (window == window.top) {
 	// Check to see if we can register a menu item in Greasemonkey. Note: This is only supported in Greasemonkey for Firefox.
 	if( (typeof GM_registerMenuCommand) == 'undefined') {
 		// No greasemonkey extensions. Load manually.
-		
+
 		// IE? Change over our event listeners to its own format.
 		createIEaddEventListeners();
 		
@@ -1171,18 +1259,6 @@ if (window == window.top) {
 	
 		if( autoLoadValue == true && thisIsBlocked == false ) {
 			$(document).ready(function(){
-				// Attatch our new stylesheet.
-				attachCSS(settings.baseURL + settings.stylesheetURL, "sBarCSS");
-		
-				// Create the div for the StudyBar ghost.
-				barGhost = document.createElement('div');
-				// Set the ID of the toolbar.
-				barGhost.id = "sbarGhost";
-				barGhost.innerHTML = "<center><img src=\"" + settings.baseURL + "presentation/images/loading.gif\" style=\"margin-top:10px;\" /></center>";
-				
-				// Insert it as the first node in the body node.
-				document.body.insertBefore(barGhost, document.body.firstChild);
-			
 				bootstrap();
 			});
 		}
