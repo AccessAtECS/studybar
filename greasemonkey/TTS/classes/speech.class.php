@@ -1,4 +1,5 @@
 <?php
+error_reporting(E_ERROR | E_WARNING);
 
 /**
  * speech class.
@@ -6,22 +7,26 @@
  */
 class speech {
 
+	private $debug = 0;
+
 	private $rawData;
 	private $cleanData;
 	private $chunks;
 	private $uri;
 	private $fileMappings = array();
 	
-	private $uniqueID;
-	private $loadMultiplier = 1;
-	private $maxLoad = 2;
+	private $uniqueID; // This speech allocation's unique ID
+	private $loadMultiplier = 1; // Multiplier for CPU load, used to estimate compilation time.
+	private $maxLoad = 2; // Maximum CPU load.
 	public $encodingState = 0;
 	private $averageChunkTime = 4;
-	private $splitBy = 400;
-	private $maxOffset = 10;
+	private $splitBy = 400; // characters to split the string by.
+	private $maxOffset = 50; // Maximum offset for splitby for finding the seperating character.
+	private $maxPageLength = 30000; // characters
 	private $cacheTimeout = 3600; // 1h
 	private $scratch_path = "/var/www/projectsportal/htdocs/seb/StudyBar/TTS/cache/";
 	private $output_path = "/var/www/projectsportal/htdocs/seb/StudyBar/TTS/cache/";
+	private $script_path = "/var/www/projectsportal/htdocs/seb/StudyBar/TTS/";
 	private $output_uri = "http://access.ecs.soton.ac.uk/seb/StudyBar/TTS/cache/";
 
 	/**
@@ -48,11 +53,15 @@ class speech {
 			if( $this->dataIsCached() == true ){
 				// Return cached data.
 			} else {
+				// Decode b64 data recieved from the client. Note that JS can't send + or / without causing issues, so we've swapped these for different characters.
 				$decoded = base64_decode( str_replace(array("-", "_"), array("/", "+"), $rawData) );
+				
+				//if($this->debug == 1) file_put_contents($this->scratch_path . "chunks/decod-" . rand(0, 99) . ".txt", $decoded);
+				
+				// Sanitize tags and phoneticise elements for TTS.
+				if($this->debug == 1) file_put_contents($this->script_path . "debug/" . $this->uniqueID . ".txt", "__construct:> Decoding complete. Data: $decoded\n\n", FILE_APPEND);
 				$this->sanitizeString($decoded);
 				$this->writeTranscript();
-				//file_put_contents($this->scratch_path . "testing.txt", base64_decode( str_replace(array("-", "_"), array("/", "+"), $rawData) ) );
-				//echo strlen($rawData) . " - " . strlen(file_get_contents($this->scratch_path . "testing.txt"));
 			}
 			
 			// Flush any out of date fields.
@@ -69,32 +78,63 @@ class speech {
 	 */
 	function sanitizeString($data){
         //$alterations = array('!' => 'exclem', '#' => 'pound', '?' => 'question mark', ';' => 'semicolon', ':' => 'colon', '[' => 'left bracket', '\\' => 'back slash', ']' => 'right bracket', '^' => 'carat', '_' => 'underscore', '`' => 'reverse apostrophe', '|' => 'pipe', '~'=>'tilde', '"' => 'quote', '$' => 'dollar', '%' => 'percent', '&' => 'ampersand', '\'' => 'apostrophe', '(' => 'open paren', ')' => 'close paren', '*' => 'asterisk', '+' => 'plus', ',' => 'comma', '-' => 'dash', '.' => 'dot', '/' => 'slash', '{' => 'open curly bracket', '}' => 'close curly bracket', '"' => 'quote', 'bigham' => 'biggum', 'cse' => 'C S E', 'url' => 'U R L');
-        $alterations = array('Ï' => 'oe', '&#156;' => 'oe');
+        $alterations = array('Ï' => 'oe', '&#156;' => 'oe', ' am ' => 'ahy em', '’' => '', '\'' => '');
         
         //Strip tags and content that we dont want.
         $data = $this->strip_tags_content($data, "<script><noscript>", TRUE);
+        if($this->debug == 1) file_put_contents($this->script_path . "debug/" . $this->uniqueID . ".txt", "sanitizeString:> Stripping Tags. Data: $data\n\n", FILE_APPEND);
         
-        // Strip all tags
-        $clean = strip_tags( $data, "<a><img><iframe>" );
+        
+        // Put a dot at the end of a heading to force a pause.
+        $clean = preg_replace( "/(<h[0-9]>)(.*?)(<\/h[0-9]>)/i", " $2. ", $data );
+        if($this->debug == 1) file_put_contents($this->script_path . "debug/" . $this->uniqueID . ".txt", "sanitizeString:> Altering Headings. Data: $clean\n\n", FILE_APPEND);
+        
+        // Strip all tags, apart from the ones we want to give context to.
+        //$clean = strip_tags( $clean, "<a><img><iframe><input><textarea>" );
+        //if($this->debug == 1) file_put_contents($this->script_path . "debug/" . $this->uniqueID . ".txt", "sanitizeString:> Removed non-required tags. Data: $clean\n\n", FILE_APPEND);
         
         // Convert tags to what we want to be read out.
 		//IMG's
 		$clean = preg_replace( "/(<img.*?((alt\s*=\s*(?<q>'|\"))(?<text>.*?)\k<q>.*?)?>)/i", ". Image: $5 ", $clean );
+		if($this->debug == 1) file_put_contents($this->script_path . "debug/" . $this->uniqueID . ".txt", "sanitizeString:> Images. Data: $clean\n\n", FILE_APPEND);
+		
+		
+		// Inputs
+		$clean = preg_replace( "/(<input.*?type\s*?=\s*?(?:\"|')(.*?)(?:\"|').*?\/>)/i", ". $2 Input ", $clean );
+		//This isnt working.
+		if($this->debug == 1) file_put_contents($this->script_path . "debug/" . $this->uniqueID . ".txt", "sanitizeString:> Inputs. Data: $clean\n\n", FILE_APPEND);
+		
+		
+		// Text areas.
+		$clean = preg_replace_callback( "/(<textarea.*?>((.*?)<\/textarea>)?)/i", "speech::match_textareas", $clean );		
+		if($this->debug == 1) file_put_contents($this->script_path . "debug/" . $this->uniqueID . ".txt", "sanitizeString:> Text Areas. Data: $clean\n\n", FILE_APPEND);
+		
 		
 		// Links
 		/*$clean = preg_replace_callback( "/(<a.*?((href\s*=\s*(?<q>'|\"))(?<text>.*?)\k<q>.*?)?>)/i", "speech::match_links", $clean ); */
 		$clean = preg_replace_callback( "/(<a.*?>(.*?)<\/a>)/i", "speech::match_links", $clean );
+		if($this->debug == 1) file_put_contents($this->script_path . "debug/" . $this->uniqueID . ".txt", "sanitizeString:> Links. Data: $clean\n\n", FILE_APPEND);
 		
-		$clean = preg_replace( "/<.*?>/", " ", $clean );
+		
+		// Remove any orphaned tags.
+		$clean = preg_replace( "/(<.*?>)/", "", $clean );
+        if($this->debug == 1) file_put_contents($this->script_path . "debug/" . $this->uniqueID . ".txt", "sanitizeString:> Orphaned Tags. Data: $clean\n\n", FILE_APPEND);
         
-		// Remove all duplicate newlines
-        $clean = preg_replace( "/(\r|\n)/", " ", $clean );        
+        
+		// Remove all duplicate newlines and tabs
+        $clean = preg_replace( "/(\r|\n|	)/", "", $clean );   
+        if($this->debug == 1) file_put_contents($this->script_path . "debug/" . $this->uniqueID . ".txt", "sanitizeString:> Newlines. Data: $clean\n\n", FILE_APPEND);     
         
         $clean = str_replace( array_keys($alterations), array_values($alterations), $clean );
+        if($this->debug == 1) file_put_contents($this->script_path . "debug/" . $this->uniqueID . ".txt", "sanitizeString:> Alterations. Data: $clean\n\n", FILE_APPEND);
         
-        $clean = html_entity_decode($clean);
         
-        $this->sseek($clean);
+        $clean = html_entity_decode( $clean );
+        
+        
+        if($this->debug == 1) file_put_contents($this->script_path . "debug/" . $this->uniqueID . ".txt", "sanitizeString:> Sanitisation complete. Data: $clean\n\n", FILE_APPEND);
+        
+        $this->sseek( $clean );
 	}
 
 	/**
@@ -107,50 +147,70 @@ class speech {
 	private function sseek($data){		
 		$outString = "";
 		$start = 0;
-		$previousOffset = 0;
 		$chunks = ceil(strlen($data) / $this->splitBy);		
 		
 		if(strlen($data) > $this->splitBy){
 			
 			for($i=1; $i <= $chunks; $i++){
-				$chunk = trim( substr( $data, ($start  + $previousOffset), $this->splitBy ), ".");
+				$chunk = ltrim( substr( $data, $start, $this->splitBy ), ".");
 				$chunk = preg_replace("/ [ \r\n\v\f]+/", " ", $chunk);
 				
 				// Find the closest space at the end of the string within offset distance.
-				// Where is the location of the last space?
-				$loc = strrpos($chunk, " ");
+				// Where is the location of the last dot?
+				$loc = strrpos($chunk, ".");
+				
 				$diff = strlen($chunk) - $loc;
 				
 				// Is there a space within the offset distance inside this part of the string?
-				if($diff < $this->maxOffset && $i != $chunks){
-					// Yes, take up to that point, alter the offset for the next run.
+				if($diff < $this->maxOffset && $i != $chunks && $loc !== false){
+					// Yes, take up to that point, alter the offset for the next run to a negative so that it does'nt lose any data.
 					$chunk = substr($chunk, 0, $loc);
-					$previousOffset = 0 - $diff;
+					$start += 0 - $diff;
+					
+					if($this->debug == 1) file_put_contents($this->script_path . "debug/" . $this->uniqueID . ".txt", "sseek:> Using current chunk, dot found. Offset: $start\n", FILE_APPEND);
 				} else {
 					// No. We're going to have to take some of the next string up to maxoffset. Go grab it.
-					$forwardChunk = substr( $data, $start + ($this->splitBy + $previousOffset), $this->maxOffset );
+					$forwardChunk = substr( $data, $start + $this->splitBy, $this->maxOffset );
 					$forwardChunk = preg_replace("/ [ \r\n\v\f]+/", " ", $forwardChunk);
 					
-					$fwloc = strrpos($forwardChunk, " ");
+					// Is there a dot in the next forwardchunk?
+					$fwloc = strpos($forwardChunk, ".");
 					
 					if($fwloc !== FALSE){
 						$chunk .= substr($forwardChunk, 0, $fwloc);
-						$previousOffset = $fwloc;
+						$start += $fwloc;
+						
+						if($this->debug == 1) file_put_contents($this->script_path . "debug/" . $this->uniqueID . ".txt", "sseek:> Using fwchunk, dot found. Offset: $start\n", FILE_APPEND);
 					} else {
+						$spaceLoc = strrpos($chunk, " ");
+						
+						if($spaceLoc !== FALSE){
+							// Use the normal chunk, but find the closest space to the end to split by.
+							$spaceDiff = strlen($chunk) - $spaceLoc;
+							$chunk = substr($chunk, 0, $spaceLoc);
+							$start += 0 - $spaceDiff;
+							if($this->debug == 1) file_put_contents($this->script_path . "debug/" . $this->uniqueID . ".txt", "sseek:> Using current chunk, no dot found, using space. Offset: $start\n", FILE_APPEND);
+						} else {
+							if($this->debug == 1) file_put_contents($this->script_path . "debug/" . $this->uniqueID . ".txt", "sseek:> Using current chunk, no dot found, no space found.\n", FILE_APPEND);
+							// Look for a space in the next chunk in the max offset.
+						}
+
 						// Plan B, we're going to have to leave it as it is.
 					}
 				}
 				
-				$start = $i * $this->splitBy;
+				$start += $this->splitBy;
 				$outString .= $chunk . "\n";
 				$this->addMapping($chunk);
 			}
 		} else {
+			if($this->debug == 1) file_put_contents($this->script_path . "debug/" . $this->uniqueID . ".txt", "sseek:> Data size is under chunk size. Using a single chunk. Data: $data\n\n", FILE_APPEND);
 			$outString = $data;
 			$this->addMapping($data);
 		}
 		
 		$this->cleanData = $outString;
+		// this WILL NOT WORK with large datasets. Use while() through the dataset rather than an if statement for splitBy.
 		$this->chunks = $chunks;
 	}
 
@@ -167,9 +227,17 @@ class speech {
 		
 		if($matches[2] != ""){
 			//return ". Link to " . $matches[5] . " ";
-			return ". Link " . $matches[2] . " ";
+			return " link " . $matches[2] . " ";
 		} else {
 			return " ";
+		}
+	}
+	
+	private static function match_textareas($matches){
+		if(count($matches) > 3){
+			return ". textarea input " . $matches[3] . ". ";
+		} else {
+			return ". textarea Input ";
 		}
 	}
 	
@@ -302,19 +370,8 @@ class speech {
 	private function deleteFile($path){
 		if(file_exists($path)){
 			//$status = unlink($path);
-			
 		}
 	} 
-	
-	/**
-	 * checkLoad function.
-	 * 
-	 * @access private
-	 * @return void
-	 */
-	private function checkLoad(){
-	
-	}
 	
 	/**
 	 * execute function.
@@ -325,7 +382,11 @@ class speech {
 	public function execute(){
 		if($this->encodingState > -1){
 			$this->writePlaylist();
-			shell_exec("nice -n 19 /var/scripts/SB_generateAudio.sh {$this->scratch_path}/{$this->uniqueID}.txt {$this->uniqueID} awb > /dev/null &");
+			shell_exec("nice -n 19 /var/scripts/SB_generateAudio.sh {$this->scratch_path}{$this->uniqueID}.txt {$this->uniqueID} awb > /dev/null &");
+			if($this->debug == 1) file_put_contents($this->script_path . "debug/" . $this->uniqueID . ".txt", "execute:> Running generateAudio on dataset: {$this->clean}\n\n", FILE_APPEND);
+			
+			//file_put_contents($this->scratch_path . "chunks/clean-" . rand(0, 99) . ".txt", $this->returnClean() );
+			
 			//echo $output;
 			//echo "Execution string: /var/scripts/SB_generateAudio.sh {$this->scratch_path}/{$this->uniqueID}.txt {$this->uniqueID} awb";
 		}
