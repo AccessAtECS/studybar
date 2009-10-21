@@ -29,7 +29,8 @@
 // @require       http://access.ecs.soton.ac.uk/seb/StudyBar/button.class.js
 // ==/UserScript==
 
-var versionString = "0.4.240";
+var versionString = "0.4.597";
+var buildStatus = "Alpha One";
 
 var includeScripts = [];
 
@@ -40,7 +41,7 @@ var originalPageSettings = { fontsize: "" };
 var settings = {
 				stylesheetURL: "presentation/style.css",
 				baseURL: "http://access.ecs.soton.ac.uk/seb/StudyBar/",
-				aboutBox: "<h2>About StudyBar</h2>Version " + versionString + " pre-beta<br /><br />Created by Sebastian Skuse under supervision of Mike Wald<br />Learning Societies Lab<br /> &copy; University of Southampton 2009.<br />Icons &copy; {{PLACEHOLDER}} under CC licence.",
+				aboutBox: "<h2>About StudyBar</h2>Version " + versionString + " \"" + buildStatus + "\" pre-beta<br /><div id=\"SBversionLatest\" style=\"margin-top:5px;\"><img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/clock.png\" align=\"left\" style=\"margin-right:5px;\"/> Checking for updates...</div><br />Created by Sebastian Skuse under supervision of Mike Wald<br />Learning Societies Lab<br /> &copy; University of Southampton 2009.<br />Fugue Icons &copy; <a href=\"http://www.pinvoke.com/\">pinvoke</a> under Creative Commons licence.",
 				textSizeLevel: 1,
 				ttsSplitChunkSize: 700,
 				invoked: "false"
@@ -52,37 +53,37 @@ var toolbarItems = {
 		resizeDown: { id: 'resizeDown', ico: 'font_decrease.png', act: 'resizeText(-0.5)', tip: 'Decrease text size', clickEnabled: true },
 		fontSettings: { id: 'fontSettings', ico: 'font.png', act: 'fontSettingsDialog()', tip: 'Font settings', clickEnabled: true,
 				dialogs: {
-					main: "<h2>Page font settings</h2><label for=\"sbfontface\">Font Face:</label> <select id=\"sbfontface\"><option value=\"sitespecific\">--Site Specific--</option><option value=\"arial\">Arial</option><option value=\"courier\">Courier</option><option value=\"cursive\">Cursive</option><option value=\"fantasy\">Fantasy</option><option value=\"georgia\">Georgia</option><option value=\"helvetica\">Helvetica</option><option value=\"impact\">Impact</option><option value=\"monaco\">Monaco</option><option value=\"monospace\">Monospace</option><option value=\"sans-serif\">Sans-Serif</option><option value=\"tahoma\">Tahoma</option><option value=\"times new roman\">Times New Roman</option><option value=\"trebuchet ms\">Trebuchet MS</option><option value=\"verdant\">Verdana</option></select><br /><br /> <label for=\"sblinespacing\">Line Spacing:</label> <input type=\"text\" name=\"sblinespacing\" id=\"sblinespacing\" maxlength=\"3\" size=\"3\" value=\"100\">%<br /><br /><div class=\"sbarDialogButton\"><a id=\"sbfontfaceapply\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Apply</a></div>"
+					main: "<h2>Page font settings</h2><label for=\"sbfontface\">Font Face:</label> <select id=\"sbfontface\"><option value=\"sitespecific\">--Site Specific--</option><option value=\"arial\">Arial</option><option value=\"courier\">Courier</option><option value=\"cursive\">Cursive</option><option value=\"fantasy\">Fantasy</option><option value=\"georgia\">Georgia</option><option value=\"helvetica\">Helvetica</option><option value=\"impact\">Impact</option><option value=\"monaco\">Monaco</option><option value=\"monospace\">Monospace</option><option value=\"sans-serif\">Sans-Serif</option><option value=\"tahoma\">Tahoma</option><option value=\"times new roman\">Times New Roman</option><option value=\"trebuchet ms\">Trebuchet MS</option><option value=\"verdant\">Verdana</option></select><br /><br /> <label for=\"sblinespacing\">Line Spacing:</label> <input type=\"text\" name=\"sblinespacing\" id=\"sblinespacing\" maxlength=\"3\" size=\"3\" value=\"100\">%<br /><br /><div class=\"sbarDialogButton\"><a id=\"sbfontfaceapply\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Apply</a></div>"
 				}
 		},
 		spell: { id: 'spell', ico: 'spell-off.png', act: 'spellCheckPage()', tip: 'Start / Stop spellchecker', clickEnabled: true, checkerEnabled: false },
 		dictionary: { id: 'dictionary', ico: 'book_open.png', act: 'getDictionaryRef()', tip: 'Dictionary', clickEnabled: true },
 		TTS: { id: 'tts', ico: 'sound.png', act: 'ttsOptions()', tip: 'Text to Speech options', clickEnabled: true, positition: "", playingItem: "",
 				dialogs: {
-					options: "<h2>Text to Speech options</h2> <div class=\"sbarDialogButton\"> <a id=\"sbStartTTS\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Get Text-To-Speech for this page</a></div>",
+					options: "<h2>Text to Speech options</h2> <div class=\"sbarDialogButton\"> <a id=\"sbStartTTS\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Get Text-To-Speech for this page</a></div>",
 					starting: "<h2>Text To Speech</h2> <center>Text to Speech conversion is taking place. <br /><img src='http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/loadingbig.gif' /><br />Time remaining: <div id='sbttstimeremaining'>calculating</div><br />Please wait... <center>"
 				},
 				extendedButtons: {
-					controlBox: "<div id=\"sbAudioControlBox\"> <div id=\"sb-btn-plpaus\" class=\"sb-btn\"><a title=\"Play / Pause\" id=\"sb-tts-plpaus\"><img id=\"sb-btnico-plpaus\" src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/control-pause.png\" border=\"0\" /></a></div> <div id=\"sb-btn-rwd\" class=\"sb-btn\"><a title=\"Rewind\" id=\"sb-tts-rwd\"><img id=\"sb-btnico-rwd\" src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/control-stop-180.png\" border=\"0\" /></a></div> <div id=\"sb-btn-stop\" class=\"sb-btn\"><a title=\"Stop\" id=\"sb-tts-stop\"><img id=\"sb-btnico-stop\" src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/control-stop-square.png\" border=\"0\" /></a></div> </div>"
+					controlBox: "<div id=\"sbAudioControlBox\"> <div id=\"sb-btn-plpaus\" class=\"sb-btn\"><a title=\"Play / Pause\" id=\"sb-tts-plpaus\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"><img id=\"sb-btnico-plpaus\" src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/control-pause.png\" border=\"0\" /></a></div> <div id=\"sb-btn-rwd\" class=\"sb-btn\"><a title=\"Rewind\" id=\"sb-tts-rwd\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"><img id=\"sb-btnico-rwd\" src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/control-stop-180.png\" border=\"0\" /></a></div> <div id=\"sb-btn-stop\" class=\"sb-btn\"><a title=\"Stop & Close TTS\" id=\"sb-tts-stop\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"><img id=\"sb-btnico-stop\" src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/control-stop-square.png\" border=\"0\" /></a></div> </div>"
 				}
 		},
 		references: { id: 'references', ico: 'book_link.png', act: 'referencesDialog()', tip: 'References', clickEnabled: true,
 				dialogs: {
-					landingDialog: "<h2>References</h2> <p>You can use this function to find information on this page to make a reference.<br /><br />What type of material are you referencing?</p><select id=\"sbReferenceType\"> </select><br /><br /> <div class=\"sbarDialogButton\"><a id=\"sbScanReferences\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Scan Page</a></div>",
+					landingDialog: "<h2>References</h2> <p>You can use this function to find information on this page to make a reference.<br /><br />What type of material are you referencing?</p><select id=\"sbReferenceType\"> </select><br /><br /> <div class=\"sbarDialogButton\"><a id=\"sbScanReferences\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Scan Page</a></div>",
 					results: "<h2>Reference Scan Results</h2><p>Below are the results that we've found on this page.</p><br /> <table border=\"0\"><tr><td><b>Author:</b></td><td>{{author}}</td></tr><tr><td><b>Date:</b></td><td>{{date}}</td></tr><tr><td><b>Page Title:</b></td><td>{{ptitle}}</td></tr><tr><td><b>Name of Website:</b></td><td>{{wsname}}</td></tr><tr><td><b>Accessed:</b></td><td>{{accessed}}</td></tr><tr><td><b>URL:</b></td><td>{{url}}</td></tr></table>"
 				}
 		},
 		CSS: { id: 'changecss', ico: 'palette.png', act: 'changeColours(0)', tip: 'Change Styles', clickEnabled: true, 
 				dialogs: { 
-					colourDialog: "<h2>Change Colour settings</h2> <div class=\"sbarDialogButton\"> <a id=\"sbColourChange\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Change StudyBar Colour</a></div> <div class=\"sbarDialogButton\"><a id=\"sbChangeSiteColours\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Change Site Colours</a></div> <div class=\"sbarDialogButton\"><a id=\"sbAttachCSSStyle\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Premade page styles</a></div>",
-					sbColourDialog: "<h2>Change StudyBar Colour</h2> <label for=\"sbbackgroundcolour\">Background Colour: </label><input type=\"text\" name=\"sbbackgroundcolour\" id=\"sbbackgroundcolour\"> <a id=\"sbSetColour\"><img src=\"" + settings.baseURL + "/presentation/images/accept.png \" /> Set</a> <br /> <a onclick=\"document.getElementById('sbbackgroundcolour').value = 'black';\">Black</a> <a onclick=\"document.getElementById('sbbackgroundcolour').value = 'white';\">White</a> <a onclick=\"document.getElementById('sbbackgroundcolour').value = 'grey';\">Grey</a> <br /> <div class=\"sbarDialogButton\"><a id=\"sbRandomColour\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Random</a></div> <div class=\"sbarDialogButton\"> <a id=\"sbColourReset\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Reset to Default</a></div>",
-					sbSiteColours: "<h2>Change this site's colours</h2> <label for=\"sbbackgroundcolour\" style=\"display:block\">Background Colour: </label><input type=\"text\" name=\"sbpagebackgroundcolour\" id=\"sbpagebackgroundcolour\"><br /> <label for=\"sbtextcolour\" style=\"display:block\">Text Colour: </label><input type=\"text\" name=\"sbtextcolour\" id=\"sbtextcolour\"><br /><label for=\"sblinkcolour\" style=\"display:block\">Link Colour: </label><input type=\"text\" name=\"sblinkcolour\" id=\"sblinkcolour\"> <div class=\"sbarDialogButton\"><a id=\"applyPageColours\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Apply</a></div>",
-					sbAttachCSS: "<h2>Premade page styles<h2><div class=\"sbarDialogButton\"><a id=\"sbApplyCSS-wb\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Black on White</a></div> <div class=\"sbarDialogButton\"><a id=\"sbApplyCSS-wbw\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> White on Black</a></div> <div class=\"sbarDialogButton\"><a id=\"sbApplyCSS-yb\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Yellow on Black</a></div>"
+					colourDialog: "<h2>Change Colour settings</h2> <div class=\"sbarDialogButton\"> <a id=\"sbColourChange\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Change StudyBar Colour</a></div> <div class=\"sbarDialogButton\"><a id=\"sbChangeSiteColours\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Change Site Colours</a></div> <div class=\"sbarDialogButton\"><a id=\"sbAttachCSSStyle\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Premade page styles</a></div>",
+					sbColourDialog: "<h2>Change StudyBar Colour</h2> <label for=\"sbbackgroundcolour\">Background Colour: </label><input type=\"text\" name=\"sbbackgroundcolour\" id=\"sbbackgroundcolour\"> <a id=\"sbSetColour\"><img src=\"" + settings.baseURL + "/presentation/images/accept.png \" /> Set</a> <br /> <a onclick=\"document.getElementById('sbbackgroundcolour').value = 'black';\">Black</a> <a onclick=\"document.getElementById('sbbackgroundcolour').value = 'white';\">White</a> <a onclick=\"document.getElementById('sbbackgroundcolour').value = 'grey';\">Grey</a> <br /> <div class=\"sbarDialogButton\"><a id=\"sbRandomColour\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Random</a></div> <div class=\"sbarDialogButton\"> <a id=\"sbColourReset\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Reset to Default</a></div>",
+					sbSiteColours: "<h2>Change this site's colours</h2> <label for=\"sbbackgroundcolour\" style=\"display:block\">Background Colour: </label><input type=\"text\" name=\"sbpagebackgroundcolour\" id=\"sbpagebackgroundcolour\"><br /> <label for=\"sbtextcolour\" style=\"display:block\">Text Colour: </label><input type=\"text\" name=\"sbtextcolour\" id=\"sbtextcolour\"><br /><label for=\"sblinkcolour\" style=\"display:block\">Link Colour: </label><input type=\"text\" name=\"sblinkcolour\" id=\"sblinkcolour\"> <div class=\"sbarDialogButton\"><a id=\"applyPageColours\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Apply</a></div>",
+					sbAttachCSS: "<h2>Premade page styles<h2><div class=\"sbarDialogButton\"><a id=\"sbApplyCSS-wb\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Black on White</a></div> <div class=\"sbarDialogButton\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"><a id=\"sbApplyCSS-wbw\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> White on Black</a></div> <div class=\"sbarDialogButton\"><a id=\"sbApplyCSS-yb\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Yellow on Black</a></div>"
 				} 
 		},
 		settings: { id: 'settings', ico: 'cog.png', act: 'settingsDialog(0)', tip: 'Settings', styleClass: ' fright', clickEnabled: true,
 		 		dialogs: {
-					landingDialog: "<h2>StudyBar Settings</h2> <div class=\"sbarDialogButton\"> <a id=\"sbResetDisabled\"><img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Reset Disabled websites</a></div> <div class=\"sbarDialogButton\"> <a href=\"#\" id=\"sbresetAll\"><img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Reset Everything to defaults</a></div>"
+					landingDialog: "<h2>StudyBar Settings</h2> <div class=\"sbarDialogButton\"> <a id=\"sbResetDisabled\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"><img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Reset Disabled websites</a></div> <div class=\"sbarDialogButton\"> <a href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\" id=\"sbresetAll\"><img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Reset Everything to defaults</a></div>"
 				}
 		},
 		help : { id: 'help', ico: 'information.png', act: 'studybarHelp()', tip: 'Help', styleClass: ' fright', clickEnabled: true,
@@ -92,7 +93,7 @@ var toolbarItems = {
 		}
 	};
 	
-var closeDialogs = { landing: "<h2>Studybar is about to exit</h2> <div class=\"sbarDialogButton\"><a id=\"sbCloseThisSite\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Close for this site only</a></div> <div class=\"sbarDialogButton\"><a href=\"#\" id=\"sbCloseAllSites\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Close for all sites</a></div>" };	
+var closeDialogs = { landing: "<h2>Studybar is about to exit</h2> <div class=\"sbarDialogButton\"><a id=\"sbCloseThisSite\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Close for this site only</a></div> <div class=\"sbarDialogButton\"><a href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\" id=\"sbCloseAllSites\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Close for all sites</a></div>" };	
 	
 var buttons = {};
 
@@ -173,6 +174,20 @@ window.populateBar = function(){
 	}
 }
 
+// <Name> identifyBrowser
+// <Purpose> Identify the user's current browser, so we can modify how StudyBar behaves in other areas of the script
+
+window.identifyBrowser = function(){
+	if(navigator.appName == 'Microsoft Internet Explorer'){
+		return "IE";
+	} else {
+		if (/Firefox/.test(navigator.userAgent)){
+		 	return "FF";
+		} else {
+			return navigator.appName;
+		}	
+	}	
+}
 
 window.attachJS = function(url, id){
 	javascriptFile = document.createElement("script");
@@ -187,11 +202,11 @@ window.checkUpdate = function(){
 	if(XHRMethod == "GM-XHR"){
 		GM_xmlhttpRequest({ method: "GET",
 				url: settings.baseURL + "update.php", 
-				onload: updatecheckResult,
+				onload: updatecheckResult
 			});	
 	
 	} else {
-	
+		$('#SBversionLatest').html("<img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/tick-circle-frame.png\" align=\"left\" style=\"margin-right:5px\" /> You are running the latest version.<br /> This browser will auto-update StudyBar.");
 	}
 
 }
@@ -210,7 +225,11 @@ window.updatecheckResult = function(response){
 			alert("StudyBar Version " + ro.ver + " is available! You have " + versionString + ". You will now be prompted to install the new version.");
 			window.location = ro.updateURL;
 		} else {
-
+			if(thisVer > serverVer){
+				$('#SBversionLatest').html("<img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/exclamation-octagon.png\" align=\"left\" style=\"margin-right:5px;\" /> You are running a pre-release version of StudyBar.<br /> Click <a href=\"" + ro.updateURL + "\">here</a> for the current stable release.");
+			} else {
+				$('#SBversionLatest').html("<img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/tick-circle-frame.png\" align=\"left\" style=\"margin-right:5px;\" /> You are running the latest version.");
+			}
 		}
 	}
 }
@@ -292,6 +311,8 @@ window.resizeText = function(multiplier) {
 // <Purpose> Invoke the Text To Speech engine.
 
 window.startTTS = function(){
+	
+	toolbarItems.TTS.clickEnabled = false;
 
 	var $sendData = $(document.body).clone();
 	
@@ -450,15 +471,17 @@ window.insertTTSControlBox = function(player){
 	$("#sb-btn-tts").after( toolbarItems.TTS.extendedButtons.controlBox );
 	toolbarItems.TTS.position = 0;
 	toolbarItems.TTS.playingItem = 0;
-
-
 	
 	$('#sb-tts-plpaus').tipsy({gravity: 'n'});
 	$('#sb-tts-stop').tipsy({gravity: 'n'});
 	$('#sb-tts-rwd').tipsy({gravity: 'n'});
 	
 	mbEventListener('sb-tts-plpaus', 'click', function(e){
-		unsafeWindow.document["audioe"].sendEvent('play'); 
+		if(identifyBrowser() == "FF"){
+			unsafeWindow.document["audioe"].sendEvent('play'); 
+		} else {
+			window.document["audioe"].sendEvent('play'); 
+		}
 	});
 	
 	mbEventListener('sb-tts-rwd', 'click', function(e){
@@ -466,12 +489,20 @@ window.insertTTSControlBox = function(player){
 		var currentPosition = toolbarItems.TTS.position;
 		var newPosition = (currentPosition - scrubAmount);
 		if(newPosition < 0) newPosition = 0;
-
-		unsafeWindow.document["audioe"].sendEvent('seek', newPosition); 
+		
+		if(identifyBrowser() == "FF"){
+			unsafeWindow.document["audioe"].sendEvent('seek', newPosition); 
+		} else {
+			window.document["audioe"].sendEvent('seek', newPosition); 
+		}
 	});
 	
 	mbEventListener('sb-tts-stop', 'click', function(e){
-		unsafeWindow.document["audioe"].sendEvent('stop'); 
+		if(identifyBrowser() == "FF"){
+			unsafeWindow.document["audioe"].sendEvent('stop');
+		} else {
+			window.document["audioe"].sendEvent('stop');
+		} 
 		
 		$("#sbar #sbAudioControlBox").animate({ 
 	        marginRight: "0px",
@@ -487,39 +518,69 @@ window.removeControlBox = function(){
       	$("#sbar #sbAudioControlBox").remove();
       	$("#audioo").remove();
       	$(".tipsy").remove();
+      	toolbarItems.TTS.clickEnabled = true;
 }
 
-unsafeWindow.playerReady = function(obj) {
-	//if()
-	insertTTSControlBox(obj);
-	unsafeWindow.document["audioe"].addModelListener("STATE", "SBAudioStateListener");
-	unsafeWindow.document["audioe"].addModelListener("TIME", "SBAudioTimeMonitor");
-	unsafeWindow.document["audioe"].addViewListener("ITEM", "SBAudioItemMonitor");
-}
-
-
-unsafeWindow.SBAudioTimeMonitor = function(obj){
-	toolbarItems.TTS.position = obj.position;
-}
-
-unsafeWindow.SBAudioItemMonitor = function(obj){
-	toolbarItems.TTS.playingItem = obj.item;
-}
-
-
-unsafeWindow.SBAudioStateListener = function(obj) {
-	var state = obj.newstate;
-	
-	// This isnt working yet.
-	if(state == "COMPLETED" && toolbarItems.TTS.playingItem == unsafeWindow.document['audioe'].getPlaylist().length){
-		alert('completed');
+if(identifyBrowser() == "FF"){
+	unsafeWindow.playerReady = function(obj) {
+		insertTTSControlBox(obj);
+		unsafeWindow.document["audioe"].addModelListener("STATE", "SBAudioStateListener");
+		unsafeWindow.document["audioe"].addModelListener("TIME", "SBAudioTimeMonitor");
+		unsafeWindow.document["audioe"].addControllerListener("ITEM", "SBAudioItemMonitor");
 	}
 	
-	if(state == "IDLE" || state == "PAUSED") {
-		$('#sb-btnico-plpaus').attr('src', settings.baseURL + "presentation/images/control.png");
-	} else {
-		$('#sb-btnico-plpaus').attr('src', settings.baseURL + "presentation/images/control-pause.png");
+	unsafeWindow.SBAudioTimeMonitor = function(obj){
+		toolbarItems.TTS.position = obj.position;
+	}
+	
+	unsafeWindow.SBAudioItemMonitor = function(obj){
+		toolbarItems.TTS.playingItem = obj.index;
+	}
+	
+	unsafeWindow.SBAudioStateListener = function(obj) {
+		var state = obj.newstate;
+	
+		if(state == "COMPLETED" && (toolbarItems.TTS.playingItem + 1) == (unsafeWindow.document['audioe'].getPlaylist().length - 1)){
+			// Completed, remove controlbox and reset everything back to normal.
+			removeControlBox();
+		}
+		
+		if(state == "IDLE" || state == "PAUSED") {
+			$('#sb-btnico-plpaus').attr('src', settings.baseURL + "presentation/images/control.png");
+		} else {
+			$('#sb-btnico-plpaus').attr('src', settings.baseURL + "presentation/images/control-pause.png");
+		}	
+	}
+} else {
+	window.playerReady = function(obj) {
+		insertTTSControlBox(obj);
+		window.document["audioe"].addModelListener("STATE", "SBAudioStateListener");
+		window.document["audioe"].addModelListener("TIME", "SBAudioTimeMonitor");
+		window.document["audioe"].addControllerListener("ITEM", "SBAudioItemMonitor");
 	}	
+	
+	window.SBAudioTimeMonitor = function(obj){
+		toolbarItems.TTS.position = obj.position;
+	}
+	
+	window.SBAudioItemMonitor = function(obj){
+		toolbarItems.TTS.playingItem = obj.index;
+	}
+	
+	window.SBAudioStateListener = function(obj) {
+		var state = obj.newstate;
+	
+		if(state == "COMPLETED" && (toolbarItems.TTS.playingItem + 1) == (window.document['audioe'].getPlaylist().length - 1)){
+			// Completed, remove controlbox and reset everything back to normal.
+			removeControlBox();
+		}
+		
+		if(state == "IDLE" || state == "PAUSED") {
+			$('#sb-btnico-plpaus').attr('src', settings.baseURL + "presentation/images/control.png");
+		} else {
+			$('#sb-btnico-plpaus').attr('src', settings.baseURL + "presentation/images/control-pause.png");
+		}	
+	}
 }
 
 
@@ -535,6 +596,8 @@ window.spellCheckPage = function(){
 		
 		$('#sb-btnico-spell').attr('src', settings.baseURL + "presentation/images/spell.png");
 		toolbarItems.spell.checkerEnabled = true;
+		
+		
 	/*} else {
 		alert('removing spellcheck');
 		
@@ -787,8 +850,10 @@ window.setColour = function(code){
 // <Purpose> Load the TTS options dialog.
 
 window.ttsOptions = function(){
-	jQuery.facebox( toolbarItems.TTS.dialogs.options );
-	mbEventListener('sbStartTTS', 'click', function(e){ startTTS() } );
+	if(toolbarItems.TTS.clickEnabled == true){
+		jQuery.facebox( toolbarItems.TTS.dialogs.options );
+		mbEventListener('sbStartTTS', 'click', function(e){ startTTS() } );
+	}
 }
 
 
@@ -932,8 +997,6 @@ window.scanForReferenceMaterial = function(type){
 	
 	jQuery.facebox.changeFaceboxContent( outputHTML );
 	
-	
-	
 	// Run select box listener attachments.
 	if(authorUniqueMatches != null) {
 		if(authorUniqueMatches.length > 1){
@@ -1031,6 +1094,7 @@ window.unloadStudyBar = function(all){
 	
 	// Remove the divs for StudyBar from the page.
 	$('#facebox').remove();
+	$('#sbarGhost').remove();
 	$('#sbar').remove();
 	$('#sBarCSS').remove();
 	$('.tipsy').remove();
@@ -1182,21 +1246,6 @@ window.mbEventListener = function(target, event, fnc){
 	 }
 }
 
-// <Name> identifyBrowser
-// <Purpose> Identify the user's current browser, so we can modify how StudyBar behaves in other areas of the script
-
-window.identifyBrowser = function(){
-	if(navigator.appName == 'Microsoft Internet Explorer'){
-		return "IE";
-	} else {
-		if (/Firefox/.test(navigator.userAgent)){
-		 	return "FF";
-		} else {
-			return navigator.appName;
-		}	
-	}	
-}
-
 // <Name> setXHRMethod
 // <Purpose> Set a global for the XmlHTTPRequest method that we are using, so that it can be used elsewhere in the script.
 
@@ -1314,7 +1363,7 @@ if (window == window.top) {
 		var autoLoadValue = GM_getValue('autoload', false);
 		
 		// Register the greasemonkey menu items.
-		GM_registerMenuCommand("Load StudyBar Toolbar", function(){ loadStudyBar() });
+		GM_registerMenuCommand("Load StudyBar Toolbar", function(){ bootstrap(); });
 		
 		// Get the blocked sites list
 		disabledSites = GM_getValue('blocked', []);
@@ -1330,7 +1379,6 @@ if (window == window.top) {
 				if(disabledSites[i] == window.location.hostname) thisIsBlocked = true;
 			}
 		}
-	
 	
 		if( autoLoadValue == true && thisIsBlocked == false ) {
 			$(document).ready(function(){
