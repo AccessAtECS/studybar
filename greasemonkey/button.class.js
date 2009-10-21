@@ -3,7 +3,7 @@ window.returnNewButton = function(id, ico, act, tip, sClass, baseURL){
 	var buttonItem = {
 		conf : { 
 			id: id, icon: ico, action: act, tooltip: tip, HTML: "", styleClass: sClass,
-			template: "<div class=\"sb-btn(CLASS)\"><a title=\"(TITLE)\" id=\"(ID)\"><img src=\"(URL)\" border=\"0\" /></a></div> " 
+			template: "<div id=\"sb-btn-(ID)\" class=\"sb-btn(CLASS)\"><a title=\"(TITLE)\" id=\"(ID)\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 3) + "\"><img id=\"sb-btnico-(ID)\" src=\"(URL)\" border=\"0\" /></a></div> " 
 		},
 		
 		addListener: function(){
@@ -19,15 +19,13 @@ window.returnNewButton = function(id, ico, act, tip, sClass, baseURL){
 				$(output).appendTo('#sbar');
 			}
 			
-			//alert( $('#' + buttonItem.conf.id) );
-			
 			$('#' + buttonItem.conf.id).tipsy({gravity: 'n'});
 			buttonItem.addListener();
 		},
 		
 		buildHTML: function(){
 			tmpHTML = buttonItem.conf.template.replace("(TITLE)", buttonItem.conf.tooltip);
-			tmpHTML = tmpHTML.replace("(ID)", buttonItem.conf.id);
+			tmpHTML = tmpHTML.replace(/\(ID\)/ig, buttonItem.conf.id);
 			tmpHTML = tmpHTML.replace("(URL)", baseURL + "presentation/images/" + buttonItem.conf.icon);
 
 			if( buttonItem.conf.styleClass != "" && (typeof buttonItem.conf.styleClass) == "string" ){

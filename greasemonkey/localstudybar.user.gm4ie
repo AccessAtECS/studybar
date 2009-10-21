@@ -1,0 +1,5 @@
+[Script]
+Name = StudyBar
+Domains = *
+ScriptURL = http://access.ecs.soton.ac.uk/seb/StudyBar/localStudyBar.user.js
+version = 1

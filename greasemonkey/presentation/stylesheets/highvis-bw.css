@@ -1,5 +1,27 @@
 @import url(chrome://flashblock/content/flashblock.css);
 
+/* IMPORTANT NOTE.  These stylesheets are NOT intended for
+website authors. They are for browser configuration. Using
+them on websites that you author might not be a good idea.
+- Silas S. Brown */
+
+/* WARNING: This stylesheet has been automatically generated.
+You can edit it if you like, but it would probably be easier
+to change the program that generates them.
+*/
+
+/* Note: CSS can specify that frames be scrollable but it
+cannot specify that frames be resizeable.  This can cause
+problems on small screens.  To work around it in Firefox,
+go to about:config and set layout.frames.force_resizability
+to true.
+*/
+
+/* Note that this stylesheet uses absolute point sizes in a
+number of different places.  This is not good coding, but it
+is necessary with some browsers, to avoid problems when
+interacting with author-supplied stylesheets. */
+
 /* Some versions of IE ignore the first entry so: */
 .placebo { line-height: normal; } /* should be harmless even if there is a
 .placebo - we want line-height normal
@@ -21,7 +43,7 @@ input[type=submit] {
    background-color: #600040;
 }
 acronym, b, strong {
-   color: #FFFF80;
+   color: yellow;
 }
 a[onclick]:active , a[onclick]:active abbr, a[onclick]:active acronym,
 a[onclick]:active b, a[onclick]:active basefont, a[onclick]:active
@@ -61,11 +83,11 @@ a:link big, a:link br, a:link code, a:link em, a:link font, a:link h1,
 a:link h2, a:link h3, a:link h4, a:link h5, a:link h6, a:link i,
 a:link kbd, a:link small, a:link span, a:link strong, a:link tt,
 a:link u, a:link var {
-   color: #00FF00;
+   color: #0080FF;
 }
 h2, h2 a, h2 a b, h2 abbr, h2 center, h2 span {
-   font-size: 27.0px;
-   margin: 0px 0px 0px 57.0px;
+   font-size: 30.0px;
+   margin: 0px 0px 0px 63.3px;
 }
 b, h1, h1 a, h1 a b, h1 abbr, h1 center, h1 span, h2, h2 a, h2 a b, h2
 abbr, h2 center, h2 span, h3, h3 a, h3 a b, h3 abbr, h3 center, h3
@@ -83,11 +105,11 @@ fieldset, font, form, html, iframe, img, input, kbd, label, legend,
 li, listing, marquee, menu, multicol, nobr, object, ol, option,
 plaintext, pre, q, s, select, small, span, strike, sub, sup, table,
 td, textarea, th, tr, tt, ul, var, xmp {
-   color: yellow;
+   color: white;
 }
 h6, h6 a, h6 a b, h6 abbr, h6 center, h6 span {
-   font-size: 15.0px;
-   margin: 0px 0px 0px 135.0px;
+   font-size: 16.7px;
+   margin: 0px 0px 0px 150.0px;
 }
 :not(:empty) a:link:after, :not(:empty) a:visited:after, :not(:empty)
 a[onclick]:after {
@@ -118,8 +140,8 @@ td, textarea, th, tr, ul, xmp {
    font-family: Times New Roman, times, utopia, /* charter, */ serif /* TNR is listed first for the benefit of broken Xft systems that need the MS fonts to make them look OK. Shouldn't have any effect on other systems. */;
 }
 img {
-   background: #808000;
-   background-color: #808000;
+   background: #808080;
+   background-color: #808080;
 }
 html, input, textarea {
    overflow: auto;
@@ -207,7 +229,7 @@ strong, sub, sup, table, td, th, tr, tt, u, ul, var, xmp {
    white-space: normal /* don't "nowrap" */;
 }
 body {
-   margin: /* keep away from window borders */ 1ex 5.0px 1ex 5.0px;
+   margin: /* keep away from window borders */ 1ex 5.6px 1ex 5.6px;
 }
 address, cite, dfn, em, h1, h1 a, h1 a b, h1 abbr, h1 center, h1 span,
 h2, h2 a, h2 a b, h2 abbr, h2 center, h2 span, h3, h3 a, h3 a b, h3
@@ -236,7 +258,7 @@ abbr, h2 center, h2 span, h3, h3 a, h3 a b, h3 abbr, h3 center, h3
 span, h4, h4 a, h4 a b, h4 abbr, h4 center, h4 span, h5, h5 a, h5 a b,
 h5 abbr, h5 center, h5 span, h6, h6 a, h6 a b, h6 abbr, h6 center, h6
 span {
-   color: #8080FF;
+   color: #40C090;
 }
 button {
    background: #600040;
@@ -257,8 +279,8 @@ a:visited:hover h5, a:visited:hover h6, a:visited:hover i,
 a:visited:hover kbd, a:visited:hover small, a:visited:hover span,
 a:visited:hover strong, a:visited:hover tt, a:visited:hover u,
 a:visited:hover var {
-   background: #0000C0;
-   background-color: #0000C0;
+   background: #400000;
+   background-color: #400000;
 }
 input[type=reset] {
    background: #400060;
@@ -302,8 +324,8 @@ a[onclick]:hover h3, a[onclick]:hover h4, a[onclick]:hover h5,
 a[onclick]:hover h6, a[onclick]:hover i, a[onclick]:hover kbd,
 a[onclick]:hover small, a[onclick]:hover span, a[onclick]:hover
 strong, a[onclick]:hover tt, a[onclick]:hover u, a[onclick]:hover var {
-   background: #0000C0;
-   background-color: #0000C0;
+   background: #400000;
+   background-color: #400000;
 }
 P, a, abbr, acronym, address, b, basefont, big, blink, blockquote,
 body, button, canvas, caption, center, cite, code, col, colgroup, dd,
@@ -312,11 +334,11 @@ b, h5 abbr, h5 center, h5 span, html, i, iframe, img, input, kbd,
 label, legend, li, listing, marquee, menu, multicol, nobr, object, ol,
 option, plaintext, pre, q, s, select, small, span, strike, strong,
 sub, sup, table, td, textarea, th, tr, tt, u, ul, var, xmp {
-   font-size: 18.0px;
+   font-size: 20.0px;
 }
 h4, h4 a, h4 a b, h4 abbr, h4 center, h4 span {
-   font-size: 21.0px;
-   margin: 0px 0px 0px 102.0px;
+   font-size: 23.3px;
+   margin: 0px 0px 0px 113.3px;
 }
 code, kbd, pre, tt, var {
    font-family: monospace;
@@ -390,7 +412,7 @@ var:after, :not(:empty) var:before, :not(:empty) xmp:after,
    filter: none;
    float: none;
    font-family: Times New Roman, times, utopia, /* charter, */ serif /* TNR is listed first for the benefit of broken Xft systems that need the MS fonts to make them look OK. Shouldn't have any effect on other systems. */;
-   font-size: 18.0px;
+   font-size: 20.0px;
    font-size-adjust: none;
    font-style: normal;
    font-variant: normal;
@@ -417,7 +439,7 @@ blockquote[type=cite] {
    padding: 1em 0px 0px 0px;
 }
 dir, dl, li, menu, ol, ul {
-   margin: 0 1em 0 10.0px;
+   margin: 0 1em 0 11.1px;
 }
 a:visited , a:visited abbr, a:visited acronym, a:visited b, a:visited
 basefont, a:visited big, a:visited br, a:visited code, a:visited em,
@@ -452,7 +474,7 @@ s, strike {
    text-decoration: line-through;
 }
 h5, h5 a, h5 a b, h5 abbr, h5 center, h5 span {
-   margin: 0px 0px 0px 120.0px;
+   margin: 0px 0px 0px 133.3px;
 }
 P, a, abbr, acronym, address, b, basefont, big, blink, blockquote,
 body, button, canvas, caption, center, cite, code, col, colgroup, dd,
@@ -467,7 +489,7 @@ sub, sup, table, td, th, tr, tt, u, ul, var, xmp {
    width: auto;
 }
 address, cite, dfn, em, i, u {
-   color: white;
+   color: #FFFF80;
 }
 P, a, abbr, acronym, address, basefont, big, blink, blockquote, body,
 button, canvas, caption, center, cite, code, col, colgroup, dd, dfn,
@@ -568,8 +590,8 @@ var:after, :not(:empty) var:before, :not(:empty) xmp:after,
    content: "[";
 }
 h3, h3 a, h3 a b, h3 abbr, h3 center, h3 span {
-   font-size: 24.0px;
-   margin: 0px 0px 0px 81.0px;
+   font-size: 26.7px;
+   margin: 0px 0px 0px 90.0px;
 }
 a:link:active , a:link:active abbr, a:link:active acronym,
 a:link:active b, a:link:active basefont, a:link:active big,
@@ -632,8 +654,8 @@ sub, sup, table, td, textarea, th, tr, tt, u, ul, var, xmp {
    height: auto;
 }
 h1, h1 a, h1 a b, h1 abbr, h1 center, h1 span {
-   font-size: 30.0px;
-   margin: 0px 0px 0px 30.0px;
+   font-size: 33.3px;
+   margin: 0px 0px 0px 33.3px;
 }
 blockquote {
    margin: 1em 4em;
@@ -650,7 +672,7 @@ a[onclick] em, a[onclick] font, a[onclick] h1, a[onclick] h2,
 a[onclick] h3, a[onclick] h4, a[onclick] h5, a[onclick] h6, a[onclick]
 i, a[onclick] kbd, a[onclick] small, a[onclick] span, a[onclick]
 strong, a[onclick] tt, a[onclick] u, a[onclick] var {
-   color: #00FF00;
+   color: #0080FF;
 }
 P, a, abbr, acronym, address, b, basefont, big, blink, blockquote,
 body, button, canvas, caption, center, cite, code, col, colgroup, dd,
@@ -687,7 +709,7 @@ tt, u, ul, var, xmp {
    visibility: visible /* because we're forcing position to static, we must also force visibility to visible otherwise will get large gaps.  Unfortunately some authors use visibility:hidden when they should be using display:none, and CSS does not provide a way of saying '[visibility=hidden] {display:none}' */;
 }
 td, th {
-   padding: 1.0px;
+   padding: 1.1px;
 }
 a:link , a:link P, a:link a, a:link abbr, a:link acronym, a:link
 address, a:link b, a:link basefont, a:link big, a:link blink, a:link
@@ -800,14 +822,14 @@ tt:after, :not(:empty) tt:before, :not(:empty) u:after, :not(:empty)
 u:before, :not(:empty) ul:after, :not(:empty) ul:before, :not(:empty)
 var:after, :not(:empty) var:before, :not(:empty) xmp:after,
 :not(:empty) xmp:before, :root:not(HTML), :root:not(HTML) :not(:empty) {
-   color: yellow;
+   color: white;
 }
-.diffchange { color: white;}
-font[color] { color: pink;}
+.diffchange, .was, .now { color: #FFFF80;}
+font[color] { color: #FFFF40;}
 
 div.interlinear tt { display: inline-table; line-height: 1.02; text-align: center; padding: 0.3em; }
 div.interlinear tt i { display: table-row-group; text-align: center; }
-div.interlinear tt i.line1 { display: table-header-group; text-align: center; color: #8080FF; }
+div.interlinear tt i.line1 { display: table-header-group; text-align: center; color: #40C090; }
 div#container div#result tt { display: inline-table; line-height: 1.02; text-align: center; padding: 0.3em; }
 div#container div#result tt > i { display: table-header-group; text-align: center; }
 div#container div#result tt > b, div#container div#result tt > acronym { display: table-row-group; text-align: center; }
