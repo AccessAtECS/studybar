@@ -29,8 +29,8 @@
 // @require       http://access.ecs.soton.ac.uk/seb/StudyBar/button.class.js
 // ==/UserScript==
 
-var versionString = "0.4.597";
-var buildStatus = "Alpha One";
+var versionString = "0.4.905";
+var buildStatus = "Public Preview";
 
 var includeScripts = [];
 
@@ -41,7 +41,7 @@ var originalPageSettings = { fontsize: "" };
 var settings = {
 				stylesheetURL: "presentation/style.css",
 				baseURL: "http://access.ecs.soton.ac.uk/seb/StudyBar/",
-				aboutBox: "<h2>About StudyBar</h2>Version " + versionString + " \"" + buildStatus + "\" pre-beta<br /><div id=\"SBversionLatest\" style=\"margin-top:5px;\"><img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/clock.png\" align=\"left\" style=\"margin-right:5px;\"/> Checking for updates...</div><br />Created by Sebastian Skuse under supervision of Mike Wald<br />Learning Societies Lab<br /> &copy; University of Southampton 2009.<br />Fugue Icons &copy; <a href=\"http://www.pinvoke.com/\">pinvoke</a> under Creative Commons licence.",
+				aboutBox: "<h2>About StudyBar</h2>Version " + versionString + " \"" + buildStatus + "\" beta<br /><div id=\"SBversionLatest\" style=\"margin-top:5px;\"><img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/clock.png\" align=\"left\" style=\"margin-right:5px;\"/> Checking for updates...</div><br />Created by <a href=\"http://ecs.soton.ac.uk/people/mw/\">Mike Wald</a> and <a href=\"http://ecs.soton.ac.uk/people/scs/\">Sebastian Skuse</a>.<br />Learning Societies Lab<br /> &copy; University of Southampton 2009.<br />Fugue Icons &copy; <a href=\"http://www.pinvoke.com/\">pinvoke</a> under Creative Commons licence, Dictionary &copy; <a href=\"http://en.wiktionary.org/\">Wiktionary</a> under Creative Commons licence.",
 				textSizeLevel: 1,
 				ttsSplitChunkSize: 700,
 				invoked: "false"
@@ -56,12 +56,12 @@ var toolbarItems = {
 					main: "<h2>Page font settings</h2><label for=\"sbfontface\">Font Face:</label> <select id=\"sbfontface\"><option value=\"sitespecific\">--Site Specific--</option><option value=\"arial\">Arial</option><option value=\"courier\">Courier</option><option value=\"cursive\">Cursive</option><option value=\"fantasy\">Fantasy</option><option value=\"georgia\">Georgia</option><option value=\"helvetica\">Helvetica</option><option value=\"impact\">Impact</option><option value=\"monaco\">Monaco</option><option value=\"monospace\">Monospace</option><option value=\"sans-serif\">Sans-Serif</option><option value=\"tahoma\">Tahoma</option><option value=\"times new roman\">Times New Roman</option><option value=\"trebuchet ms\">Trebuchet MS</option><option value=\"verdant\">Verdana</option></select><br /><br /> <label for=\"sblinespacing\">Line Spacing:</label> <input type=\"text\" name=\"sblinespacing\" id=\"sblinespacing\" maxlength=\"3\" size=\"3\" value=\"100\">%<br /><br /><div class=\"sbarDialogButton\"><a id=\"sbfontfaceapply\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Apply</a></div>"
 				}
 		},
-		spell: { id: 'spell', ico: 'spell-off.png', act: 'spellCheckPage()', tip: 'Start / Stop spellchecker', clickEnabled: true, checkerEnabled: false },
+		spell: { id: 'spell', ico: 'spell-off.png', act: 'spellCheckPage()', tip: 'Start spellchecker', clickEnabled: true, checkerEnabled: false },
 		dictionary: { id: 'dictionary', ico: 'book_open.png', act: 'getDictionaryRef()', tip: 'Dictionary', clickEnabled: true },
 		TTS: { id: 'tts', ico: 'sound.png', act: 'ttsOptions()', tip: 'Text to Speech options', clickEnabled: true, positition: "", playingItem: "",
 				dialogs: {
-					options: "<h2>Text to Speech options</h2> <div class=\"sbarDialogButton\"> <a id=\"sbStartTTS\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Get Text-To-Speech for this page</a></div>",
-					starting: "<h2>Text To Speech</h2> <center>Text to Speech conversion is taking place. <br /><img src='http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/loadingbig.gif' /><br />Time remaining: <div id='sbttstimeremaining'>calculating</div><br />Please wait... <center>"
+					options: "<h2>Text to Speech options</h2> What do you want to convert to speech? <div class=\"sbarDialogButton\"> <a id=\"sbStartTTS\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Entire page</a></div> <div class=\"sbarDialogButton\"> <a id=\"sbStartTTSSelection\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Selected text</a></div>",
+					starting: "<h2>Text To Speech</h2> <center>Text to Speech conversion is taking place. <br /><img src='http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/loadingbig.gif' /><br />Time remaining: <div id='sbttstimeremaining'>calculating</div><br />Please wait... </center>"
 				},
 				extendedButtons: {
 					controlBox: "<div id=\"sbAudioControlBox\"> <div id=\"sb-btn-plpaus\" class=\"sb-btn\"><a title=\"Play / Pause\" id=\"sb-tts-plpaus\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"><img id=\"sb-btnico-plpaus\" src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/control-pause.png\" border=\"0\" /></a></div> <div id=\"sb-btn-rwd\" class=\"sb-btn\"><a title=\"Rewind\" id=\"sb-tts-rwd\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"><img id=\"sb-btnico-rwd\" src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/control-stop-180.png\" border=\"0\" /></a></div> <div id=\"sb-btn-stop\" class=\"sb-btn\"><a title=\"Stop & Close TTS\" id=\"sb-tts-stop\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"><img id=\"sb-btnico-stop\" src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/control-stop-square.png\" border=\"0\" /></a></div> </div>"
@@ -81,19 +81,12 @@ var toolbarItems = {
 					sbAttachCSS: "<h2>Premade page styles<h2><div class=\"sbarDialogButton\"><a id=\"sbApplyCSS-wb\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Black on White</a></div> <div class=\"sbarDialogButton\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"><a id=\"sbApplyCSS-wbw\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> White on Black</a></div> <div class=\"sbarDialogButton\"><a id=\"sbApplyCSS-yb\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Yellow on Black</a></div>"
 				} 
 		},
-		settings: { id: 'settings', ico: 'cog.png', act: 'settingsDialog(0)', tip: 'Settings', styleClass: ' fright', clickEnabled: true,
-		 		dialogs: {
-					landingDialog: "<h2>StudyBar Settings</h2> <div class=\"sbarDialogButton\"> <a id=\"sbResetDisabled\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"><img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Reset Disabled websites</a></div> <div class=\"sbarDialogButton\"> <a href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\" id=\"sbresetAll\"><img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Reset Everything to defaults</a></div>"
-				}
-		},
-		help : { id: 'help', ico: 'information.png', act: 'studybarHelp()', tip: 'Help', styleClass: ' fright', clickEnabled: true,
-				dialogs: {
-					landingPage: "<h2>StudyBar Help</h2> <h3>Topics</h3>"
-				}
-		}
+		resetPage: { id: 'resetPage', ico: 'arrow-curve-180-left.png', act: 'resetPage()', tip: 'Reset page', styleClass: ' fright', clickEnabled: true },
+		help : { id: 'help', ico: 'information.png', act: 'studybarHelp()', tip: 'Help', styleClass: ' fright', clickEnabled: true },
+		feedback : { id: 'feedback', ico: 'megaphone.png', act: 'feedbackLink()', tip: 'Give Feedback', styleClass: ' fright', clickEnabled: true }
 	};
 	
-var closeDialogs = { landing: "<h2>Studybar is about to exit</h2> <div class=\"sbarDialogButton\"><a id=\"sbCloseThisSite\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Close for this site only</a></div> <div class=\"sbarDialogButton\"><a href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\" id=\"sbCloseAllSites\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Close for all sites</a></div>" };	
+var closeDialogs = { landing: "<h2>Studybar is about to exit</h2> Are you sure you want to close StudyBar? <div class=\"sbarDialogButton\"><a href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\" id=\"sbCloseAllSites\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Yes</a></div>" };	
 	
 var buttons = {};
 
@@ -138,22 +131,26 @@ window.loadStudyBar = function(){
 			// Set studybar to load next time we load a page.
 			GM_setValue('autoload', true);
 			
+			/*
 			if(identifyBrowser() != 'Opera' && identifyBrowser() != 'IE') {		
 				if(disabledSites.length > 0){
 					for (var i=0; i<disabledSites.length; i++ ){
 						if(disabledSites[i] == window.location.hostname) delete disabledSites[i];
 					}
 				}
-			}
+			}*/
 		}
 		$("#sbarlogo").bind("click", function(e){ 
 			jQuery.facebox( settings.aboutBox );
 			setTimeout(function(){ checkUpdate(); }, 500);
 		});
-	
+		
+		if (identifyBrowser() == 'IE') { // IE
+			$('#sbarGhost').html(" ");
+			$('#sbarGhost').css('height', '1px');
+		}
 	
 		settings.invoked = "true";
-		//$('#sbarGhost').html();
 	}
 }
 
@@ -206,7 +203,16 @@ window.checkUpdate = function(){
 			});	
 	
 	} else {
-		$('#SBversionLatest').html("<img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/tick-circle-frame.png\" align=\"left\" style=\"margin-right:5px\" /> You are running the latest version.<br /> This browser will auto-update StudyBar.");
+		var ua = navigator.userAgent.toLowerCase();
+		if(identifyBrowser() == 'Safari' || identifyBrowser() == 'IE' || ua.indexOf( "safari" ) != -1) {	
+
+			jQuery.getJSON(settings.baseURL + 'xmlhttp/remote.php?rt=update&callback=?', function(data) {
+    			updatecheckResult(data);
+			});
+
+		} else {
+			$('#SBversionLatest').html("<img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/tick-circle-frame.png\" align=\"left\" style=\"margin-right:5px\" /> You are running the latest version.<br /> This browser will auto-update StudyBar.");
+		}
 	}
 
 }
@@ -214,22 +220,24 @@ window.checkUpdate = function(){
 window.updatecheckResult = function(response){
 	if(XHRMethod == "GM-XHR"){
 		var ro = eval("(" + response.responseText + ")");
-		
-		var serverVer = ro.ver;
-		var thisVer = versionString;
-		
-		serverVer = serverVer.replace(/[.]/g, '');
-		thisVer = thisVer.replace(/[.]/g, '');
-		
-		if(serverVer > thisVer){
-			alert("StudyBar Version " + ro.ver + " is available! You have " + versionString + ". You will now be prompted to install the new version.");
-			window.location = ro.updateURL;
+	} else {
+		var ro = response;
+	}
+	
+	var serverVer = ro.ver;
+	var thisVer = versionString;
+	
+	serverVer = serverVer.replace(/[.]/g, '');
+	thisVer = thisVer.replace(/[.]/g, '');
+	
+	if(serverVer > thisVer){
+		alert("StudyBar Version " + ro.ver + " is available! You have " + versionString + ". You will now be prompted to install the new version.");
+		window.location = ro.updateURL;
+	} else {
+		if(thisVer > serverVer){
+			$('#SBversionLatest').html("<img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/exclamation-octagon.png\" align=\"left\" style=\"margin-right:5px;\" /> You are running a pre-release version of StudyBar.<br /> Click <a href=\"" + ro.updateURL + "\">here</a> for the current stable release.");
 		} else {
-			if(thisVer > serverVer){
-				$('#SBversionLatest').html("<img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/exclamation-octagon.png\" align=\"left\" style=\"margin-right:5px;\" /> You are running a pre-release version of StudyBar.<br /> Click <a href=\"" + ro.updateURL + "\">here</a> for the current stable release.");
-			} else {
-				$('#SBversionLatest').html("<img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/tick-circle-frame.png\" align=\"left\" style=\"margin-right:5px;\" /> You are running the latest version.");
-			}
+			$('#SBversionLatest').html("<img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/tick-circle-frame.png\" align=\"left\" style=\"margin-right:5px;\" /> You are running the latest version.");
 		}
 	}
 }
@@ -307,6 +315,48 @@ window.resizeText = function(multiplier) {
 }
 
 
+window.selectedTTS = function(){
+	
+	var selectedData = getSelectedText();
+
+	if(selectedData != ""){
+
+		toolbarItems.TTS.clickEnabled = false;
+		
+		// What method of XHR are we using for this?
+		if(XHRMethod == 'GM-XHR'){
+			jQuery.facebox.changeFaceboxContent( toolbarItems.TTS.dialogs.starting );
+			
+			GM_xmlhttpRequest({ method: "POST",
+					url: "http://access.ecs.soton.ac.uk/seb/StudyBar/TTS/jobController.php", 
+					onload: ttsJobSent,
+					headers:{'Content-type':'application/x-www-form-urlencoded'},
+	    			data:"page=" + encodeURIComponent(window.location) + "&data=" + encodeURI( b64( getSelectedText() ) )
+				});
+		} else {
+			// Another browser. We'll use the custom xmlhttprequest method.
+	
+			// Send the data in chunks, as chances are we cant get it all into one request.
+			
+			var transmitData = b64( getSelectedText() );
+			
+			var chunks = Math.ceil(transmitData.length / settings.ttsSplitChunkSize);
+			
+			if(chunks > 0){
+				var reqID = Math.floor(Math.random() * 5001);
+				
+				jQuery.facebox.changeFaceboxContent( "<h2>Processing</h2><p>Compacting and transmitting data...<br /><div id='compactStatus'>0 / " + chunks + "</div></p>" );
+				
+				sendTTSChunk(transmitData, 1, chunks, reqID);
+			} else {
+				jQuery.facebox.changeFaceboxContent( "<h2>Oops!</h2><p>There doesn't seem to be any content on this page, or we can't read it.</p>" );
+			}
+		}
+	} else {
+		jQuery.facebox("<h2>Text-to-Speech</h2><p>To use the text to speech feature with selected text, please first select the text on this page that you would like to convert. After you have done this, click the Text to Speech button, and select the 'selected text' option.</p>");
+	}
+}
+
 // <Name> startTTS
 // <Purpose> Invoke the Text To Speech engine.
 
@@ -322,7 +372,7 @@ window.startTTS = function(){
 	$sendData.children('script').remove();
 	$sendData.children('style').remove();
 	$sendData.children('facebox_overlay').remove();
-
+	
 	// What method of XHR are we using for this?
 	if(XHRMethod == 'GM-XHR'){
 		jQuery.facebox.changeFaceboxContent( toolbarItems.TTS.dialogs.starting );
@@ -342,12 +392,15 @@ window.startTTS = function(){
 		
 		var chunks = Math.ceil(transmitData.length / settings.ttsSplitChunkSize);
 		
-		var reqID = Math.floor(Math.random() * 5001);
-		
-		jQuery.facebox.changeFaceboxContent( "<h2>Processing</h2><p>Compacting and transmitting data...<br /><div id='compactStatus'>0 / " + chunks + "</div></p>" );
-		
-		sendTTSChunk(transmitData, 1, chunks, reqID);
-		
+		if(chunks > 0){
+			var reqID = Math.floor(Math.random() * 5001);
+			
+			jQuery.facebox.changeFaceboxContent( "<h2>Processing</h2><p>Compacting and transmitting data...<br /><div id='compactStatus'>0 / " + chunks + "</div></p>" );
+			
+			sendTTSChunk(transmitData, 1, chunks, reqID);
+		} else {
+			jQuery.facebox.changeFaceboxContent( "<h2>Oops!</h2><p>There doesn't seem to be any content on this page, or we can't read it.</p>" );
+		}
 	}
 
 }
@@ -420,6 +473,7 @@ window.ttsJobSent = function(response){
 		var ro = response;
 	}
 	
+	
 	if(ro.status == "encoding" && ro.status != "failure"){
 		if(identifyBrowser() == "FF"){
 			window.setTimeout(countdownTTS, 0, (ro.est_completion / ro.chunks), ro.ID );
@@ -429,7 +483,11 @@ window.ttsJobSent = function(response){
 			}, 0);
 		}
 	} else if(ro.status == "failure" && ro.reason == "overcapacity"){
-		jQuery.facebox("<h2>Error</h2> <p>The server is currently over capacity for text to speech conversions. Please try again later.</p>");
+		jQuery.facebox("<h2>Oops!</h2> <p>The server is currently over capacity for text to speech conversions. Please try again later.</p>");
+	} else if(ro.status == "failure" && ro.message == "") {
+		jQuery.facebox("<h2>Oops!</h2> <p>Something went wrong while we were converting this page to text. Please try again shortly.</p>");
+	} else {
+		jQuery.facebox("<h2>Oops!</h2> <p>" + ro.reason + " " + ro.message + "</p>");
 	}
 	
 }
@@ -679,7 +737,7 @@ window.removeCSS = function(){
 
 
 window.getDictionaryRef = function(){
-	var data = eval("\"" + getSelectedText() + "\";");
+	var data = eval("\"" + getSelectedText("true") + "\";");
 
 	if(data != ""){
 		$("#sb-btnico-dictionary").attr('src', settings.baseURL + "presentation/images/loading.gif");
@@ -687,12 +745,12 @@ window.getDictionaryRef = function(){
 		// Firefox greasemonkey cross domain XMLHTTP.
 		if(XHRMethod == 'GM-XHR'){
 		
-		window.setTimeout(function(){
-			GM_xmlhttpRequest({ method: "GET",
-				url: "http://en.wiktionary.org/w/api.php?action=query&titles=" + encodeURI(data.toLowerCase()) + "&prop=revisions&rvlimit=1&rvprop=content&format=json", 
-				onload: getDictionaryResponse
-			});
-		}, 0)
+			window.setTimeout(function(){
+				GM_xmlhttpRequest({ method: "GET",
+					url: "http://en.wiktionary.org/w/api.php?action=query&titles=" + encodeURI(data.toLowerCase()) + "&prop=revisions&rvlimit=1&rvprop=content&format=json", 
+					onload: getDictionaryResponse
+				});
+			}, 0);
 		
 		} else if(XHRMethod == 'CS-XHR'){
 
@@ -818,7 +876,7 @@ window.parseDictionaryResponse = function(input){
 	return output;
 }
 
-window.getSelectedText = function(){
+window.getSelectedText = function(strip){
     var text = '';
      if (window.getSelection){
         text = window.getSelection();
@@ -827,7 +885,11 @@ window.getSelectedText = function(){
      } else if (document.selection){
         text = document.selection.createRange().text;
      }
-	return String(text).replace(/([\s]+)/ig, '');
+    if(strip == "true"){
+		return String(text).replace(/([\s]+)/ig, '');
+	} else {
+		return String(text);
+	}
 }
 
 // <Name> setColour
@@ -853,7 +915,12 @@ window.ttsOptions = function(){
 	if(toolbarItems.TTS.clickEnabled == true){
 		jQuery.facebox( toolbarItems.TTS.dialogs.options );
 		mbEventListener('sbStartTTS', 'click', function(e){ startTTS() } );
+		mbEventListener('sbStartTTSSelection', 'click', function(e){ selectedTTS() });
 	}
+}
+
+window.resetPage = function(){
+	location.reload(true);
 }
 
 
@@ -1042,15 +1109,6 @@ window.scanForReferenceMaterial = function(type){
 
 }
 
-// <Name> settingsDialog
-// <Purpose> Load the settings dialog.
-
-window.settingsDialog = function(level){
-	if(level == 0){
-		jQuery.facebox( toolbarItems.settings.dialogs.landingDialog );
-	}
-}
-
 // Dialog for closing the bar.
 window.unloadOptions = function(){
 	jQuery.facebox(closeDialogs.landing);
@@ -1103,10 +1161,14 @@ window.unloadStudyBar = function(all){
 }
 
 window.studybarHelp = function(){
-	jQuery.facebox( toolbarItems.help.dialogs.landingPage );
-
+	//jQuery.facebox( toolbarItems.help.dialogs.landingPage );
+	window.location = "http://access.ecs.soton.ac.uk/studybarmenu";
 }
 
+
+window.feedbackLink = function(){
+	window.location = "http://groups.google.com/group/accessibility-toolkits/browse_thread/thread/9730dcaf177e4592?hl=en#";
+}
 
 // <Name> createIEaddEventListeners
 // <Purpose> Wrap addEventListeners to attachEvent for IE.
@@ -1370,17 +1432,17 @@ if (window == window.top) {
 		
 		//console.log(disabledSites);
 		
-		var thisIsBlocked = false;
+		//var thisIsBlocked = false;
 		
 		jQCopyCSS();
 		
-		if(disabledSites.length > 0){
+		/*if(disabledSites.length > 0){
 			for (var i=0; i<disabledSites.length; i++ ){
 				if(disabledSites[i] == window.location.hostname) thisIsBlocked = true;
 			}
-		}
+		}*/
 	
-		if( autoLoadValue == true && thisIsBlocked == false ) {
+		if( autoLoadValue == true ) {
 			$(document).ready(function(){
 				bootstrap();
 			});
