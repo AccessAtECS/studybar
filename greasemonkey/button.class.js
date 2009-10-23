@@ -3,7 +3,7 @@ window.returnNewButton = function(id, ico, act, tip, sClass, baseURL){
 	var buttonItem = {
 		conf : { 
 			id: id, icon: ico, action: act, tooltip: tip, HTML: "", styleClass: sClass,
-			template: "<div id=\"sb-btn-(ID)\" class=\"sb-btn(CLASS)\"><a title=\"(TITLE)\" id=\"(ID)\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 3) + "\"><img id=\"sb-btnico-(ID)\" src=\"(URL)\" border=\"0\" /></a></div> " 
+			template: "<div id=\"sb-btn-(ID)\" class=\"sb-btn(CLASS)\"><a title=\"(TITLE)\" id=\"(ID)\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 3) + "\"><img id=\"sb-btnico-(ID)\" src=\"(URL)\" alt=\"(TITLE)\" border=\"0\" /></a></div> " 
 		},
 		
 		addListener: function(){
@@ -24,7 +24,7 @@ window.returnNewButton = function(id, ico, act, tip, sClass, baseURL){
 		},
 		
 		buildHTML: function(){
-			tmpHTML = buttonItem.conf.template.replace("(TITLE)", buttonItem.conf.tooltip);
+			tmpHTML = buttonItem.conf.template.replace(/\(TITLE\)/ig, buttonItem.conf.tooltip);
 			tmpHTML = tmpHTML.replace(/\(ID\)/ig, buttonItem.conf.id);
 			tmpHTML = tmpHTML.replace("(URL)", baseURL + "presentation/images/" + buttonItem.conf.icon);
 

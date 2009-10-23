@@ -29,7 +29,7 @@
 // @require       http://access.ecs.soton.ac.uk/seb/StudyBar/button.class.js
 // ==/UserScript==
 
-var versionString = "0.4.905";
+var versionString = "0.5.100";
 var buildStatus = "Public Preview";
 
 var includeScripts = [];
@@ -648,7 +648,7 @@ if(identifyBrowser() == "FF"){
 
 window.spellCheckPage = function(){
 	//if(toolbarItems.spell.checkerEnabled == false){
-	
+		
 		$("textarea").spellcheck({ useXHRMethod: XHRMethod });
 		$('input[type=text]').spellcheck({ useXHRMethod: XHRMethod });
 		
@@ -964,8 +964,10 @@ window.scanForReferenceMaterial = function(type){
 
 	var emptySelect = "<select id=\"{{id}}\">{{data}}</select>";
 	var outputHTML = toolbarItems.references.dialogs.results;
-	var bodyString = $('body').html();
 
+	var $bodyString = $(document.body).clone();
+	$($bodyString).children('#facebox').remove();
+	var bodyString = $bodyString.html();
 	// Author
 	
 		// Individual? 
@@ -979,8 +981,8 @@ window.scanForReferenceMaterial = function(type){
 			
 			var authorUniqueMatches = authMatch.unique();
 			
-			if(authMatch.length == 1){
-				outputHTML = outputHTML.replace('{{author}}', authorUniqueMatches.replace(/(By[:]?[\s]{1,})/ig, ''));
+			if(authorUniqueMatches.length == 1){
+				outputHTML = outputHTML.replace('{{author}}', authorUniqueMatches[0].replace(/(By[:]?[\s]{1,})/ig, ''));
 			} else {
 				// Multiple matches found.
 				
@@ -1054,7 +1056,7 @@ window.scanForReferenceMaterial = function(type){
 	
 	// Name of website
 	var thisDomain = document.domain;
-	thisDomain = thisDomain.match(/\.([\w]{3,}\.[\w].*){1}$/);	
+	thisDomain = thisDomain.match(/([\w]{3,}\.[\w].*){1}$/);	
 	
 	outputHTML = outputHTML.replace("{{wsname}}", thisDomain[1]);
 	
@@ -1080,7 +1082,7 @@ window.scanForReferenceMaterial = function(type){
 	}
 	
 	if(titleUniqueMatches != null) {
-		if(titleUniqueMatches.length > 1){
+		if(titleUniqueMatches.length >= 1){
 			$('#sbTitleSelect').bind('change', function(e){
 				$('#sbTitleSelect').replaceWith( $('#sbTitleSelect').val() );
 				$('#sbTitleSelectAccept').remove();
