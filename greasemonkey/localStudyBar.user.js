@@ -29,70 +29,66 @@
 // @require       http://access.ecs.soton.ac.uk/seb/StudyBar/button.class.js
 // ==/UserScript==
 
-var versionString = "0.5.100";
+var versionString = "0.7.781";
 var buildStatus = "Public Preview";
-
-var includeScripts = [];
-
-var disabledSites;
-
-var originalPageSettings = { fontsize: "" };
+var relChannel = "public";
 
 var settings = {
 				stylesheetURL: "presentation/style.css",
 				baseURL: "http://access.ecs.soton.ac.uk/seb/StudyBar/",
-				aboutBox: "<h2>About StudyBar</h2>Version " + versionString + " \"" + buildStatus + "\" beta<br /><div id=\"SBversionLatest\" style=\"margin-top:5px;\"><img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/clock.png\" align=\"left\" style=\"margin-right:5px;\"/> Checking for updates...</div><br />Created by <a href=\"http://ecs.soton.ac.uk/people/mw/\">Mike Wald</a> and <a href=\"http://ecs.soton.ac.uk/people/scs/\">Sebastian Skuse</a>.<br />Learning Societies Lab<br /> &copy; University of Southampton 2009.<br />Fugue Icons &copy; <a href=\"http://www.pinvoke.com/\">pinvoke</a> under Creative Commons licence, Dictionary &copy; <a href=\"http://en.wiktionary.org/\">Wiktionary</a> under Creative Commons licence.",
-				textSizeLevel: 1,
 				ttsSplitChunkSize: 700,
 				invoked: "false"
 				};
 
 
 var toolbarItems = {
-		resizeUp: { id: 'resizeUp', ico: 'font_increase.png', act: 'resizeText(0.5);', tip: 'Increase text size', clickEnabled: true },
-		resizeDown: { id: 'resizeDown', ico: 'font_decrease.png', act: 'resizeText(-0.5)', tip: 'Decrease text size', clickEnabled: true },
+		resizeUp: { id: 'resizeUp', ico: 'font_increase.png', act: 'resizeText(1);', tip: 'Increase text size', clickEnabled: true },
+		resizeDown: { id: 'resizeDown', ico: 'font_decrease.png', act: 'resizeText(-1)', tip: 'Decrease text size', clickEnabled: true },
 		fontSettings: { id: 'fontSettings', ico: 'font.png', act: 'fontSettingsDialog()', tip: 'Font settings', clickEnabled: true,
 				dialogs: {
-					main: "<h2>Page font settings</h2><label for=\"sbfontface\">Font Face:</label> <select id=\"sbfontface\"><option value=\"sitespecific\">--Site Specific--</option><option value=\"arial\">Arial</option><option value=\"courier\">Courier</option><option value=\"cursive\">Cursive</option><option value=\"fantasy\">Fantasy</option><option value=\"georgia\">Georgia</option><option value=\"helvetica\">Helvetica</option><option value=\"impact\">Impact</option><option value=\"monaco\">Monaco</option><option value=\"monospace\">Monospace</option><option value=\"sans-serif\">Sans-Serif</option><option value=\"tahoma\">Tahoma</option><option value=\"times new roman\">Times New Roman</option><option value=\"trebuchet ms\">Trebuchet MS</option><option value=\"verdant\">Verdana</option></select><br /><br /> <label for=\"sblinespacing\">Line Spacing:</label> <input type=\"text\" name=\"sblinespacing\" id=\"sblinespacing\" maxlength=\"3\" size=\"3\" value=\"100\">%<br /><br /><div class=\"sbarDialogButton\"><a id=\"sbfontfaceapply\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Apply</a></div>"
+					main: "<h2>Page font settings</h2><label for=\"sbfontface\">Font Face:</label> <select id=\"sbfontface\"><option value=\"sitespecific\">--Site Specific--</option><option value=\"arial\">Arial</option><option value=\"courier\">Courier</option><option value=\"cursive\">Cursive</option><option value=\"fantasy\">Fantasy</option><option value=\"georgia\">Georgia</option><option value=\"helvetica\">Helvetica</option><option value=\"impact\">Impact</option><option value=\"monaco\">Monaco</option><option value=\"monospace\">Monospace</option><option value=\"sans-serif\">Sans-Serif</option><option value=\"tahoma\">Tahoma</option><option value=\"times new roman\">Times New Roman</option><option value=\"trebuchet ms\">Trebuchet MS</option><option value=\"verdant\">Verdana</option></select><br /><br /> <label for=\"sblinespacing\">Line Spacing:</label> <input type=\"text\" name=\"sblinespacing\" id=\"sblinespacing\" maxlength=\"3\" size=\"3\" value=\"100\">%<br /><br /><div class=\"sbarDialogButton\"><a id=\"sbfontfaceapply\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Apply</a></div>"
 				}
 		},
 		spell: { id: 'spell', ico: 'spell-off.png', act: 'spellCheckPage()', tip: 'Start spellchecker', clickEnabled: true, checkerEnabled: false },
 		dictionary: { id: 'dictionary', ico: 'book_open.png', act: 'getDictionaryRef()', tip: 'Dictionary', clickEnabled: true },
 		TTS: { id: 'tts', ico: 'sound.png', act: 'ttsOptions()', tip: 'Text to Speech options', clickEnabled: true, positition: "", playingItem: "",
 				dialogs: {
-					options: "<h2>Text to Speech options</h2> What do you want to convert to speech? <div class=\"sbarDialogButton\"> <a id=\"sbStartTTS\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Entire page</a></div> <div class=\"sbarDialogButton\"> <a id=\"sbStartTTSSelection\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Selected text</a></div>",
+					options: "<h2>Text to Speech options</h2> What do you want to convert to speech? <div class=\"sbarDialogButton\"> <a id=\"sbStartTTS\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Entire page</a></div> <div class=\"sbarDialogButton\"> <a id=\"sbStartTTSSelection\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Selected text</a></div>",
 					starting: "<h2>Text To Speech</h2> <center>Text to Speech conversion is taking place. <br /><img src='http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/loadingbig.gif' /><br />Time remaining: <div id='sbttstimeremaining'>calculating</div><br />Please wait... </center>"
 				},
 				extendedButtons: {
-					controlBox: "<div id=\"sbAudioControlBox\"> <div id=\"sb-btn-plpaus\" class=\"sb-btn\"><a title=\"Play / Pause\" id=\"sb-tts-plpaus\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"><img id=\"sb-btnico-plpaus\" src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/control-pause.png\" border=\"0\" /></a></div> <div id=\"sb-btn-rwd\" class=\"sb-btn\"><a title=\"Rewind\" id=\"sb-tts-rwd\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"><img id=\"sb-btnico-rwd\" src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/control-stop-180.png\" border=\"0\" /></a></div> <div id=\"sb-btn-stop\" class=\"sb-btn\"><a title=\"Stop & Close TTS\" id=\"sb-tts-stop\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"><img id=\"sb-btnico-stop\" src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/control-stop-square.png\" border=\"0\" /></a></div> </div>"
+					controlBox: "<div id=\"sbAudioControlBox\"> <div id=\"sb-btn-plpaus\" class=\"sb-btn\"><a title=\"Play / Pause\" id=\"sb-tts-plpaus\" href=\"#s-b-c\"><img id=\"sb-btnico-plpaus\" src=\"" + settings.baseURL + "presentation/images/control-pause.png\" border=\"0\" /></a></div> <div id=\"sb-btn-rwd\" class=\"sb-btn\"><a title=\"Rewind\" id=\"sb-tts-rwd\" href=\"#s-b-c\"><img id=\"sb-btnico-rwd\" src=\"" + settings.baseURL + "presentation/images/control-stop-180.png\" border=\"0\" /></a></div> <div id=\"sb-btn-stop\" class=\"sb-btn\"><a title=\"Stop & Close TTS\" id=\"sb-tts-stop\" href=\"#s-b-c\"><img id=\"sb-btnico-stop\" src=\"" + settings.baseURL + "presentation/images/control-stop-square.png\" border=\"0\" /></a></div> </div>"
 				}
 		},
 		references: { id: 'references', ico: 'book_link.png', act: 'referencesDialog()', tip: 'References', clickEnabled: true,
 				dialogs: {
-					landingDialog: "<h2>References</h2> <p>You can use this function to find information on this page to make a reference.<br /><br />What type of material are you referencing?</p><select id=\"sbReferenceType\"> </select><br /><br /> <div class=\"sbarDialogButton\"><a id=\"sbScanReferences\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Scan Page</a></div>",
+					landingDialog: "<h2>References</h2> <p>You can use this function to find information on this page to make a reference.<br /><br />What type of material are you referencing?</p><select id=\"sbReferenceType\"> </select><br /><br /> <div class=\"sbarDialogButton\"><a id=\"sbScanReferences\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Scan Page</a></div>",
 					results: "<h2>Reference Scan Results</h2><p>Below are the results that we've found on this page.</p><br /> <table border=\"0\"><tr><td><b>Author:</b></td><td>{{author}}</td></tr><tr><td><b>Date:</b></td><td>{{date}}</td></tr><tr><td><b>Page Title:</b></td><td>{{ptitle}}</td></tr><tr><td><b>Name of Website:</b></td><td>{{wsname}}</td></tr><tr><td><b>Accessed:</b></td><td>{{accessed}}</td></tr><tr><td><b>URL:</b></td><td>{{url}}</td></tr></table>"
 				}
 		},
 		CSS: { id: 'changecss', ico: 'palette.png', act: 'changeColours(0)', tip: 'Change Styles', clickEnabled: true, 
 				dialogs: { 
-					colourDialog: "<h2>Change Colour settings</h2> <div class=\"sbarDialogButton\"> <a id=\"sbColourChange\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Change StudyBar Colour</a></div> <div class=\"sbarDialogButton\"><a id=\"sbChangeSiteColours\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Change Site Colours</a></div> <div class=\"sbarDialogButton\"><a id=\"sbAttachCSSStyle\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Premade page styles</a></div>",
-					sbColourDialog: "<h2>Change StudyBar Colour</h2> <label for=\"sbbackgroundcolour\">Background Colour: </label><input type=\"text\" name=\"sbbackgroundcolour\" id=\"sbbackgroundcolour\"> <a id=\"sbSetColour\"><img src=\"" + settings.baseURL + "/presentation/images/accept.png \" /> Set</a> <br /> <a onclick=\"document.getElementById('sbbackgroundcolour').value = 'black';\">Black</a> <a onclick=\"document.getElementById('sbbackgroundcolour').value = 'white';\">White</a> <a onclick=\"document.getElementById('sbbackgroundcolour').value = 'grey';\">Grey</a> <br /> <div class=\"sbarDialogButton\"><a id=\"sbRandomColour\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Random</a></div> <div class=\"sbarDialogButton\"> <a id=\"sbColourReset\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Reset to Default</a></div>",
-					sbSiteColours: "<h2>Change this site's colours</h2> <label for=\"sbbackgroundcolour\" style=\"display:block\">Background Colour: </label><input type=\"text\" name=\"sbpagebackgroundcolour\" id=\"sbpagebackgroundcolour\"><br /> <label for=\"sbtextcolour\" style=\"display:block\">Text Colour: </label><input type=\"text\" name=\"sbtextcolour\" id=\"sbtextcolour\"><br /><label for=\"sblinkcolour\" style=\"display:block\">Link Colour: </label><input type=\"text\" name=\"sblinkcolour\" id=\"sblinkcolour\"> <div class=\"sbarDialogButton\"><a id=\"applyPageColours\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Apply</a></div>",
-					sbAttachCSS: "<h2>Premade page styles<h2><div class=\"sbarDialogButton\"><a id=\"sbApplyCSS-wb\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Black on White</a></div> <div class=\"sbarDialogButton\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"><a id=\"sbApplyCSS-wbw\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> White on Black</a></div> <div class=\"sbarDialogButton\"><a id=\"sbApplyCSS-yb\" href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Yellow on Black</a></div>"
+					colourDialog: "<h2>Change Colour settings</h2> <div class=\"sbarDialogButton\"> <a id=\"sbColourChange\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Change StudyBar Colour</a></div> <div class=\"sbarDialogButton\"><a id=\"sbChangeSiteColours\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Change Site Colours</a></div> <div class=\"sbarDialogButton\"><a id=\"sbAttachCSSStyle\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Premade page styles</a></div>",
+					sbColourDialog: "<h2>Change StudyBar Colour</h2> <label for=\"sbbackgroundcolour\">Background Colour: </label><input type=\"text\" name=\"sbbackgroundcolour\" id=\"sbbackgroundcolour\"> <a id=\"sbSetColour\" href=\"#s-b-c\"><img src=\"" + settings.baseURL + "/presentation/images/accept.png \" /> Set</a> <br /> <a onclick=\"document.getElementById('sbbackgroundcolour').value = 'black';\">Black</a> <a onclick=\"document.getElementById('sbbackgroundcolour').value = 'white';\">White</a> <a onclick=\"document.getElementById('sbbackgroundcolour').value = 'grey';\">Grey</a> <br /> <div class=\"sbarDialogButton\"><a id=\"sbRandomColour\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Random</a></div> <div class=\"sbarDialogButton\"> <a id=\"sbColourReset\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Reset to Default</a></div>",
+					sbSiteColours: "<h2>Change this site's colours</h2> <label for=\"sbbackgroundcolour\" style=\"display:block\">Background Colour: </label><input type=\"text\" name=\"sbpagebackgroundcolour\" id=\"sbpagebackgroundcolour\"><br /> <label for=\"sbtextcolour\" style=\"display:block\">Text Colour: </label><input type=\"text\" name=\"sbtextcolour\" id=\"sbtextcolour\"><br /><label for=\"sblinkcolour\" style=\"display:block\">Link Colour: </label><input type=\"text\" name=\"sblinkcolour\" id=\"sblinkcolour\"> <div class=\"sbarDialogButton\"><a id=\"applyPageColours\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Apply</a></div>",
+					sbAttachCSS: "<h2>Premade page styles</h2><div class=\"sbarDialogButton\"><a id=\"sbApplyCSS-wb\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Black on White</a></div> <div class=\"sbarDialogButton\" href=\"#s-b-c\"><a id=\"sbApplyCSS-wbw\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> White on Black</a></div> <div class=\"sbarDialogButton\"><a id=\"sbApplyCSS-yb\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Yellow on Black</a></div>"
 				} 
 		},
 		resetPage: { id: 'resetPage', ico: 'arrow-curve-180-left.png', act: 'resetPage()', tip: 'Reset page', styleClass: ' fright', clickEnabled: true },
 		help : { id: 'help', ico: 'information.png', act: 'studybarHelp()', tip: 'Help', styleClass: ' fright', clickEnabled: true },
 		feedback : { id: 'feedback', ico: 'megaphone.png', act: 'feedbackLink()', tip: 'Give Feedback', styleClass: ' fright', clickEnabled: true }
 	};
-	
-var closeDialogs = { landing: "<h2>Studybar is about to exit</h2> Are you sure you want to close StudyBar? <div class=\"sbarDialogButton\"><a href=\"#" + document.location.hash + "&sb-btnAct=" + Math.round(Math.random() * 100) + "\" id=\"sbCloseAllSites\"> <img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/dialog/arrow.png\" /> Yes</a></div>" };	
-	
+
+var sysDialog = {
+	closeDialog: "<h2>Studybar is about to exit</h2> Are you sure you want to close StudyBar? <div class=\"sbarDialogButton\"><a href=\"#s-b-c\" id=\"sbCloseAllSites\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Yes</a></div>",
+	aboutBox: "<h2>About StudyBar</h2>Version " + versionString + " \"" + buildStatus + "\" (" + relChannel + " release channel)<br /><div id=\"SBversionLatest\" style=\"margin-top:5px;\"><img src=\"" + settings.baseURL + "presentation/images/clock.png\" align=\"left\" style=\"margin-right:5px;\"/> Checking for updates...</div><br /><p style=\"line-height:120%\">Created by <a href=\"http://ecs.soton.ac.uk/people/mw/\">Mike Wald</a> and <a href=\"http://ecs.soton.ac.uk/people/scs/\">Sebastian Skuse</a>.<br />Learning Societies Lab<br /> &copy; University of Southampton 2009.<br />Fugue Icons &copy; <a href=\"http://www.pinvoke.com/\">pinvoke</a> under Creative Commons licence, Dictionary &copy; <a href=\"http://en.wiktionary.org/\">Wiktionary</a> under Creative Commons licence.<br /></p>"
+
+};
+		
 var buttons = {};
 
 var XHRMethod;
-
-var jwPlayer;
+var rteSpellTimer;
 
 var head = document.getElementsByTagName('head')[0];
 
@@ -103,7 +99,6 @@ var head = document.getElementsByTagName('head')[0];
 window.loadStudyBar = function(){
 	if(settings.invoked == "false"){
 		doc = document;
-		head = document.getElementsByTagName('head')[0]; 
 		
 		// Set the method of XHR that we're going to use.
 		setXHRMethod();
@@ -117,38 +112,29 @@ window.loadStudyBar = function(){
 		$(bar).insertAfter("#sbarGhost");
 		
 		// Add logo to studybar.
-		$("<a id=\"sbarlogo\"><img src=\"" + settings.baseURL +  "presentation/images/logo.png\" align=\"left\" border=\"0\" style=\"margin-top:6px; float:left !important;\" /></a>").appendTo('#sbar');
+		$("<a id=\"sbarlogo\"><img src=\"" + settings.baseURL +  "presentation/images/logo.png\" align=\"left\" border=\"0\" alt=\"StudyBar Logo\" style=\"margin-top:6px; float:left !important;\" /></a>").appendTo('#sbar');
 		
 		// Add items to the toolbar.
 		populateBar();
-		
-		// Save current page settings, so we can reset them later if we need to!
-		originalPageSettings.fontsize = document.body.style.fontSize;
 		
 		if( (typeof GM_setValue) == 'undefined' ) {
 		
 		} else {
 			// Set studybar to load next time we load a page.
 			GM_setValue('autoload', true);
-			
-			/*
-			if(identifyBrowser() != 'Opera' && identifyBrowser() != 'IE') {		
-				if(disabledSites.length > 0){
-					for (var i=0; i<disabledSites.length; i++ ){
-						if(disabledSites[i] == window.location.hostname) delete disabledSites[i];
-					}
-				}
-			}*/
 		}
 		$("#sbarlogo").bind("click", function(e){ 
-			jQuery.facebox( settings.aboutBox );
+			jQuery.facebox( sysDialog.aboutBox + "<div style=\"font-size:10px\">SpellCheck Client v" + jQuery.sb_spellVersion + ", fbox v" + jQuery.sb_faceboxVersion + "</div>" );
 			setTimeout(function(){ checkUpdate(); }, 500);
 		});
 		
 		if (identifyBrowser() == 'IE') { // IE
-			$('#sbarGhost').html(" ");
 			$('#sbarGhost').css('height', '1px');
+			$('#sbarGhost').remove();
 		}
+		
+		$('#sbarGhost').empty();
+		siteFixes();
 	
 		settings.invoked = "true";
 	}
@@ -198,20 +184,20 @@ window.attachJS = function(url, id){
 window.checkUpdate = function(){
 	if(XHRMethod == "GM-XHR"){
 		GM_xmlhttpRequest({ method: "GET",
-				url: settings.baseURL + "update.php", 
+				url: settings.baseURL + "update.php?b=" + identifyBrowser(), 
 				onload: updatecheckResult
 			});	
 	
 	} else {
 		var ua = navigator.userAgent.toLowerCase();
 		if(identifyBrowser() == 'Safari' || identifyBrowser() == 'IE' || ua.indexOf( "safari" ) != -1) {	
-
-			jQuery.getJSON(settings.baseURL + 'xmlhttp/remote.php?rt=update&callback=?', function(data) {
+		
+			jQuery.getJSON(settings.baseURL + 'xmlhttp/remote.php?rt=update&b=' + identifyBrowser() + '&callback=?', function(data) {
     			updatecheckResult(data);
 			});
 
 		} else {
-			$('#SBversionLatest').html("<img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/tick-circle-frame.png\" align=\"left\" style=\"margin-right:5px\" /> You are running the latest version.<br /> This browser will auto-update StudyBar.");
+			$('#SBversionLatest').html("<img src=\"" + settings.baseURL + "presentation/images/tick-circle-frame.png\" align=\"left\" style=\"margin-right:5px\" /> You are running the latest version.<br /> This browser will auto-update StudyBar.");
 		}
 	}
 
@@ -235,10 +221,21 @@ window.updatecheckResult = function(response){
 		window.location = ro.updateURL;
 	} else {
 		if(thisVer > serverVer){
-			$('#SBversionLatest').html("<img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/exclamation-octagon.png\" align=\"left\" style=\"margin-right:5px;\" /> You are running a pre-release version of StudyBar.<br /> Click <a href=\"" + ro.updateURL + "\">here</a> for the current stable release.");
+			$('#SBversionLatest').html("<img src=\"" + settings.baseURL + "presentation/images/exclamation-octagon.png\" align=\"left\" style=\"margin-right:5px;\" /> You are running a pre-release version of StudyBar.<br /> Click <a href=\"" + ro.updateURL + "\">here</a> for the current stable release.");
 		} else {
-			$('#SBversionLatest').html("<img src=\"http://access.ecs.soton.ac.uk/seb/StudyBar/presentation/images/tick-circle-frame.png\" align=\"left\" style=\"margin-right:5px;\" /> You are running the latest version.");
+			$('#SBversionLatest').html("<img src=\"" + settings.baseURL + "presentation/images/tick-circle-frame.png\" align=\"left\" style=\"margin-right:5px;\" /> You are running the latest version.");
 		}
+	}
+}
+
+
+window.siteFixes = function(){
+	switch(window.location.host){
+	
+		case "www.orkut.com":
+			$('#orkutFrame').css("margin-top", "40px");
+		break;
+	
 	}
 }
 
@@ -252,9 +249,13 @@ window.attachCSS = function(url, id){
 	stylesheet.rel = "stylesheet";
 	stylesheet.type = "text/css";
 	stylesheet.id = id;
-	head.appendChild(stylesheet);	
 	
-	$('#facebox').remove();
+	if(id == "sBarCSS"){
+		head.appendChild(stylesheet);	
+	} else {
+		$('#sBarCSS').before(stylesheet);
+	}
+	
 }
 
 window.CSStoInline = function(selector){
@@ -274,44 +275,18 @@ window.CSStoInline = function(selector){
 // <ToDo> very buggy. Resizes studybar text, which we dont want.
 
 window.resizeText = function(multiplier) {
+	
+	if(identifyBrowser() == "IE"){
+		var current = parseFloat((Math.sqrt(parseFloat($('body').css("font-size"),10).toFixed(2)/12)*12).toFixed(1));
+	} else {
+		var current = parseFloat($('body').css('font-size'));
+	}
 
-  if (document.body.style.fontSize == "") {
-    //document.body.style.fontSize = "10px";
-  }
-  
-  //alert($('body').css('fontSize'));
-  
-  //var newVal = parseFloat(settings.textSizeLevel) + (multiplier * 0.2) + "em";
-  // document.body.style.fontSize = newVal;
+	var mult = parseFloat(multiplier);
+	var newVal = parseFloat(current + mult);
 
-//alert("level: " + settings.textSizeLevel);
-  
-  if(settings.textSizeLevel == 1 && multiplier < 0) {
-  	currentLevel = 1;
-  } else {
-  	currentLevel = 1 + (settings.textSizeLevel * 0.2);
-  }
-
-  
-  if(multiplier > 0){
-  	var newVal = parseFloat( currentLevel ) + 0.2 + "em";
-  	settings.textSizeLevel += 1;
-  } else {
-  	var newVal = parseFloat( currentLevel ) - 0.2 + "em";
-  	settings.textSizeLevel -= 1;
-  }
-  
-  if(settings.textSizeLevel == 1){
-	//$('div').css('font-size', '');
-	//$('p').css('font-size', '');  
-	//$('table').css('font-size', ''); 
-	document.body.style.fontSize = ''; 
-  } else {  
-	//$('div').css('font-size', newVal);
-	//$('p').css('font-size', newVal);
-	//$('table').css('font-size', newVal);
-	document.body.style.fontSize = newVal;
-  }
+	//alert(current + "+" + mult + "=" + newVal);
+	$('body').css('font-size', newVal + "px" );
 }
 
 
@@ -419,12 +394,12 @@ window.sendTTSChunk = function(fullData, block, totalBlocks, reqID){
 		var endPoint = (start + settings.ttsSplitChunkSize);
 	}
 	
-	var dataChunk = fullData.substring(start, endPoint );
+	var payload = fullData.substring(start, endPoint);
 
 	if( block == totalBlocks ){
-		var urlString = settings.baseURL + 'xmlhttp/remote.php?rt=tts&id=' + reqID + '&data=' + dataChunk + "&chunkData=" + totalBlocks + "-" + block + "&page=" + encodeURIComponent(window.location);
+		var urlString = settings.baseURL + 'xmlhttp/remote.php?rt=tts&id=' + reqID + '&data=' + payload + "&chunkData=" + totalBlocks + "-" + block + "&page=" + encodeURIComponent(window.location);
 	} else {
-		var urlString = settings.baseURL + 'xmlhttp/remote.php?rt=tts&id=' + reqID + '&data=' + dataChunk + "&chunkData=" + totalBlocks + "-" + block;
+		var urlString = settings.baseURL + 'xmlhttp/remote.php?rt=tts&id=' + reqID + '&data=' + payload + "&chunkData=" + totalBlocks + "-" + block;
 	}
 
 	window.attachJS( urlString, 'CS-XHR' );
@@ -493,20 +468,28 @@ window.ttsJobSent = function(response){
 }
 
 window.countdownTTS = function(){
-	if(arguments[0] == 0){
-		window.setTimeout(playTTS, 0, arguments[1]);
+	if(isNaN(arguments[0])){
+		jQuery.facebox.changeFaceboxContent("<h2>Oops!</h2> <p>Something went wrong while we were converting this page to text.</p>");
 	} else {
-		$('#sbttstimeremaining').html( arguments[0] + " seconds" );
-		window.setTimeout(countdownTTS, 1000, (arguments[0] - 1), arguments[1]);
+		if(arguments[0] == 0){
+			window.setTimeout(playTTS, 0, arguments[1]);
+		} else {
+			$('#sbttstimeremaining').html( arguments[0] + " seconds" );
+			window.setTimeout(countdownTTS, 1000, (arguments[0] - 1), arguments[1]);
+		}
 	}
 }
 
 window.countdownTTSCB = function(tLeft, id){
-	if(tLeft == 0){
-		setTimeout(function(){ playTTSCB(id) }, 0);
+	if(isNaN(arguments[0])){
+		jQuery.facebox.changeFaceboxContent("<h2>Oops!</h2> <p>Something went wrong while we were converting this page to text.</p>");
 	} else {
-		$('#sbttstimeremaining').html( tLeft + " seconds" );
-		setTimeout(function(){ countdownTTSCB( (tLeft - 1), id ) }, 1000);
+		if(tLeft == 0){
+			setTimeout(function(){ playTTSCB(id) }, 0);
+		} else {
+			$('#sbttstimeremaining').html( tLeft + " seconds" );
+			setTimeout(function(){ countdownTTSCB( (tLeft - 1), id ) }, 1000);
+		}
 	}
 }
 
@@ -519,7 +502,6 @@ window.playTTS = function(){
 }
 
 window.embedPlayer = function(id){
-
 	//$('#sbar').append($("<embed src=\"" + settings.baseURL + "TTS/player/player-licensed.swf\" width=\"300\" height=\"300\" allowscriptaccess=\"always\" allowfullscreen=\"false\" flashvars=\"file=" + settings.baseURL + "TTS/cache/" + id + ".xml&autostart=true&playlist=bottom&repeat=list\" />") );
 	$('#sbar').append( $("<OBJECT width=\"1\" height=\"1\" id=\"audioo\" name=\"audioo\"> <PARAM name=\"movie\" value=\"" + settings.baseURL + "TTS/player/player-licensed.swf\"></PARAM> <PARAM name=\"flashvars\" value=\"file=" + settings.baseURL + "TTS/cache/" + id + ".xml&autostart=true&playlist=bottom&repeat=list\"><embed src=\"" + settings.baseURL + "TTS/player/player-licensed.swf\" width=\"1\" height=\"1\" allowscriptaccess=\"always\" allowfullscreen=\"false\" flashvars=\"file=" + settings.baseURL + "TTS/cache/" + id + ".xml&autostart=true&playlist=bottom&repeat=list\" id=\"audioe\" name=\"audioe\" /> </OBJECT>") );
 	$(document).trigger('close.facebox');
@@ -530,6 +512,8 @@ window.insertTTSControlBox = function(player){
 	toolbarItems.TTS.position = 0;
 	toolbarItems.TTS.playingItem = 0;
 	
+	$('#sb-btnico-tts').attr('src', settings.baseURL + "presentation/images/loadingline.gif").css('padding-top', '8px');
+
 	$('#sb-tts-plpaus').tipsy({gravity: 'n'});
 	$('#sb-tts-stop').tipsy({gravity: 'n'});
 	$('#sb-tts-rwd').tipsy({gravity: 'n'});
@@ -562,11 +546,7 @@ window.insertTTSControlBox = function(player){
 			window.document["audioe"].sendEvent('stop');
 		} 
 		
-		$("#sbar #sbAudioControlBox").animate({ 
-	        marginRight: "0px",
-			marginLeft: "0px",
-			width: "0px"
-      	}, 1500, '', removeControlBox() );
+		removeControlBox();
 
 	});
 }
@@ -575,9 +555,11 @@ window.insertTTSControlBox = function(player){
 window.removeControlBox = function(){
       	$("#sbar #sbAudioControlBox").remove();
       	$("#audioo").remove();
+      	$('#sb-btnico-tts').attr('src', settings.baseURL + "presentation/images/sound.png").css('padding-top', '6px');
       	$(".tipsy").remove();
       	toolbarItems.TTS.clickEnabled = true;
 }
+
 
 if(identifyBrowser() == "FF"){
 	unsafeWindow.playerReady = function(obj) {
@@ -601,12 +583,14 @@ if(identifyBrowser() == "FF"){
 		if(state == "COMPLETED" && (toolbarItems.TTS.playingItem + 1) == (unsafeWindow.document['audioe'].getPlaylist().length - 1)){
 			// Completed, remove controlbox and reset everything back to normal.
 			removeControlBox();
-		}
-		
-		if(state == "IDLE" || state == "PAUSED") {
+		} else if(state == "IDLE" || state == "PAUSED") {
 			$('#sb-btnico-plpaus').attr('src', settings.baseURL + "presentation/images/control.png");
+			$('#sb-btnico-tts').attr('src', settings.baseURL + "presentation/images/sound.png").css('padding-top', '6px');
 		} else {
-			$('#sb-btnico-plpaus').attr('src', settings.baseURL + "presentation/images/control-pause.png");
+			if(toolbarItems.TTS.clickEnabled == false){
+				$('#sb-btnico-plpaus').attr('src', settings.baseURL + "presentation/images/control-pause.png");
+				$('#sb-btnico-tts').attr('src', settings.baseURL + "presentation/images/loadingline.gif").css('padding-top', '8px');
+			}
 		}	
 	}
 } else {
@@ -635,8 +619,12 @@ if(identifyBrowser() == "FF"){
 		
 		if(state == "IDLE" || state == "PAUSED") {
 			$('#sb-btnico-plpaus').attr('src', settings.baseURL + "presentation/images/control.png");
+			$('#sb-btnico-tts').attr('src', settings.baseURL + "presentation/images/sound.png").css('padding-top', '6px');
 		} else {
-			$('#sb-btnico-plpaus').attr('src', settings.baseURL + "presentation/images/control-pause.png");
+			if(toolbarItems.TTS.clickEnabled == false){
+				$('#sb-btnico-plpaus').attr('src', settings.baseURL + "presentation/images/control-pause.png");
+				$('#sb-btnico-tts').attr('src', settings.baseURL + "presentation/images/loadingline.gif").css('padding-top', '8px');
+			}
 		}	
 	}
 }
@@ -649,6 +637,25 @@ if(identifyBrowser() == "FF"){
 window.spellCheckPage = function(){
 	//if(toolbarItems.spell.checkerEnabled == false){
 		
+		if((typeof unsafeWindow) != 'undefined'){
+			// Are there any TinyMCE fields on this page?
+			if((typeof unsafeWindow.tinyMCE) != 'undefined'){
+				spellCheckTMCE(unsafeWindow.tinyMCE);
+			}
+			
+			if((typeof unsafeWindow.CKEDITOR) != 'undefined'){
+				spellCheckCKE(unsafeWindow.CKEDITOR);
+			}
+		} else {
+			if((typeof window.tinyMCE) != 'undefined'){
+				spellCheckTMCE(window.tinyMCE);
+			}	
+			
+			if((typeof window.CKEDITOR) != 'undefined'){
+				spellCheckCKE(window.CKEDITOR);
+			}	
+		}
+		
 		$("textarea").spellcheck({ useXHRMethod: XHRMethod });
 		$('input[type=text]').spellcheck({ useXHRMethod: XHRMethod });
 		
@@ -656,8 +663,12 @@ window.spellCheckPage = function(){
 		toolbarItems.spell.checkerEnabled = true;
 		
 		
+
+		
 	/*} else {
 		alert('removing spellcheck');
+		
+		$('textarea').spellcheck({ spellEnabled:false });
 		
 		$('textarea').unbind('keypress blur paste');
 		$('textarea').removeData('spellchecker');
@@ -668,6 +679,28 @@ window.spellCheckPage = function(){
 		$('#sb-btnico-spell').attr('src', settings.baseURL + "presentation/images/spell-off.png");
 		toolbarItems.spell.checkerEnabled = false;
 	}*/
+}
+
+window.spellCheckTMCE = function(tinyMCE){
+	//check for plugins.spellchecker
+	tinyMCE.activeEditor.onKeyPress.add(function(ed, e) {
+		var content = tinyMCE.activeEditor.getContent();
+		if ( rteSpellTimer ) window.clearTimeout(rteSpellTimer);
+		rteSpellTimer = window.setTimeout(function() { $("#" + tinyMCE.activeEditor.editorContainer).rteSpellCheck(content, tinyMCE.activeEditor, { useXHRMethod: XHRMethod, RTEType: 'tMCE' }); }, 750);
+	});
+}
+
+window.spellCheckCKE = function(CKE){
+
+	for(var o in CKE.instances){
+	   	CKE.instances[o].document.on('keypress', function(){
+    		if ( rteSpellTimer ) window.clearTimeout(rteSpellTimer);
+    		var content = CKE.instances[o].getData();
+    		rteSpellTimer = window.setTimeout(function() { $("#" + CKE.instances[o].element.getId()).rteSpellCheck(content, CKE.instances[o], { useXHRMethod: XHRMethod, RTEType: 'CKE' }); }, 750);
+    	});
+	}
+
+
 }
 
 
@@ -683,12 +716,16 @@ window.changeColours = function(level){
 		mbEventListener('sbColourChange', "click", function(e){ changeColours(1); } );
 		mbEventListener('sbChangeSiteColours', "click", function(e){ changeColours(2); } );
 		mbEventListener('sbAttachCSSStyle', "click", function(e){ changeColours(3) } );
+		
+		$("#sbColourChange").focus();
 	}
 	if(level == 1){
 		jQuery.facebox.changeFaceboxContent( toolbarItems.CSS.dialogs.sbColourDialog );
 		mbEventListener('sbRandomColour', "click", function(e){ setColour("rand"); });
 		mbEventListener('sbSetColour', "click", function(e){ setColour( $("#sbbackgroundcolour").val() ); });
 		mbEventListener('sbColourReset', "click", function(e){ setColour("white"); });
+		
+		$("#sbbackgroundcolour").focus();
 	}
 	if(level == 2){
 		// Site colours
@@ -707,28 +744,72 @@ window.changeColours = function(level){
 			}
 		});
 		
+		mbEventListener('sblinkcolour', 'keypress', function(e){ 
+			if(e.keyCode == 13){  
+				if( $('#sbpagebackgroundcolour').val() != "undefined"){
+					document.body.style.backgroundColor = $('#sbpagebackgroundcolour').val();
+				}
+				
+				if( $('#sbtextcolour').val() != "undefined" ){
+					$('body').css('color', $('#sbtextcolour').val());
+				}
+				
+				if( $('#sblinkcolour').val() != "undefined" ){
+					$('a').css('color', $('#sblinkcolour').val());
+				}	
+				
+				$(document).trigger('close.facebox');		
+			} 
+		
+		});
+		
+		$("#sbpagebackgroundcolour").focus();
+		
 	}
 	if(level == 3){
 		jQuery.facebox.changeFaceboxContent( toolbarItems.CSS.dialogs.sbAttachCSS );
 		mbEventListener('sbApplyCSS-yb', "click", function(e){ 
-			CSStoInline("#sbar");
+			//CSStoInline("#sbar");
+			$(document).trigger('close.facebox');
 			removeCSS();
 			attachCSS(settings.baseURL + "presentation/stylesheets/highvis-yo.css", "highvis-yo");
 		});
 		
 		mbEventListener('sbApplyCSS-wb', "click", function(e){ 
-			CSStoInline("#sbar");
+			//CSStoInline("#sbar");
+			$(document).trigger('close.facebox');
 			removeCSS();
 			attachCSS(settings.baseURL + "presentation/stylesheets/highvis-wb.css", "highvis-wb");
 			
 		});
 		
 		mbEventListener('sbApplyCSS-wbw', "click", function(e){
-			CSStoInline("#sbar");
+			//CSStoInline("#sbar");
+			$(document).trigger('close.facebox');
 			removeCSS();
-			attachCSS(settings.baseURL + "presentation/stylesheets/highvis-bw.css", "highvis-wbw");
+			attachCSS(settings.baseURL + "presentation/stylesheets/high-bw.css", "highvis-wbw");
 		});
+		
+		$("#sbApplyCSS-wb").focus();
 	}
+}
+
+
+window.cloneBodyToDiv = function(){
+	var $duplicateData = $(document.body).clone();
+	var barData = $("<div id=\"sbarGhost\">" + $duplicateData.children('#sbarGhost').html() + "</div><div id=\"sbar\">" + $duplicateData.children('#sbar').html() + "</div>");
+	
+	$duplicateData.children('#sbar').remove();
+	$duplicateData.children('#sbarGhost').remove();
+	$duplicateData.children('#facebox').remove();
+	$duplicateData.children('facebox_overlay').remove();
+	
+	$('body').empty();
+	
+	$('body').html(barData);
+	$('body').append("<div id=\"sBarCSSContainer\"></div>");
+	
+	$('#sBarCSSContainer').html($duplicateData.html());
 }
 
 window.removeCSS = function(){
@@ -916,6 +997,9 @@ window.ttsOptions = function(){
 		jQuery.facebox( toolbarItems.TTS.dialogs.options );
 		mbEventListener('sbStartTTS', 'click', function(e){ startTTS() } );
 		mbEventListener('sbStartTTSSelection', 'click', function(e){ selectedTTS() });
+		
+		// This works, but stops TTS for selected text...
+		//$("#sbStartTTS").focus();
 	}
 }
 
@@ -932,6 +1016,8 @@ window.fontSettingsDialog = function(){
 		$('#sbar').css('line-height', '0%');
 		//$('#sbar').nextAll()
 	});
+	
+	$("#sbfontface").focus();
 	//sbfontfaceapply
 }
 
@@ -996,7 +1082,7 @@ window.scanForReferenceMaterial = function(type){
 				var authorSelect = emptySelect.replace("{{data}}", matchOptions);
 				authorSelect = authorSelect.replace("{{id}}", "sbAuthorSelect");
 				
-				authorSelect += " <a id=\"sbAuthorSelectAccept\"><img src=\"" + settings.baseURL + "/presentation/images/accept.png\" /></a>";
+				authorSelect += " <a id=\"sbAuthorSelectAccept\" href=\"#s-b-c\"><img src=\"" + settings.baseURL + "/presentation/images/accept.png\" /></a>";
 				
 				outputHTML = outputHTML.replace('{{author}}', authorSelect);
 			}
@@ -1020,7 +1106,7 @@ window.scanForReferenceMaterial = function(type){
 		var titleSelect = emptySelect.replace("{{data}}", matchOptions);
 		titleSelect = titleSelect.replace("{{id}}", "sbTitleSelect");
 		
-		titleSelect += " <a id=\"sbTitleSelectAccept\"><img src=\"" + settings.baseURL + "/presentation/images/accept.png\" /></a>";
+		titleSelect += " <a id=\"sbTitleSelectAccept\" href=\"#s-b-c\"><img src=\"" + settings.baseURL + "/presentation/images/accept.png\" /></a>";
 		
 		outputHTML = outputHTML.replace("{{ptitle}}", titleSelect);
 	}
@@ -1047,7 +1133,7 @@ window.scanForReferenceMaterial = function(type){
 			var dateSelect = emptySelect.replace("{{data}}", matchOptions);
 			dateSelect = dateSelect.replace("{{id}}", "sbDateSelect");
 			
-			dateSelect += " <a id=\"sbDateSelectAccept\"><img src=\"" + settings.baseURL + "/presentation/images/accept.png\" /></a>";
+			dateSelect += " <a id=\"sbDateSelectAccept\" href=\"#s-b-c\"><img src=\"" + settings.baseURL + "/presentation/images/accept.png\" /></a>";
 			
 			outputHTML = outputHTML.replace('{{date}}', dateSelect);
 		}
@@ -1059,7 +1145,6 @@ window.scanForReferenceMaterial = function(type){
 	thisDomain = thisDomain.match(/([\w]{3,}\.[\w].*){1}$/);	
 	
 	outputHTML = outputHTML.replace("{{wsname}}", thisDomain[1]);
-	
 	
 	outputHTML = outputHTML.replace( "{{url}}", window.location );
 	outputHTML = outputHTML.replace( "{{accessed}}", Date() );
@@ -1113,19 +1198,8 @@ window.scanForReferenceMaterial = function(type){
 
 // Dialog for closing the bar.
 window.unloadOptions = function(){
-	jQuery.facebox(closeDialogs.landing);
+	jQuery.facebox(sysDialog.closeDialog);
 	mbEventListener('sbCloseAllSites', 'click', function(e){ unloadStudyBar(true) } );
-	mbEventListener('sbCloseThisSite', 'click', function(e){ unloadThisSite() } );
-}
-
-// <Name> unloadThisSite
-// <Purpose> Unload StudyBar for this website.
-
-window.unloadThisSite = function(){
-	// Add this site to the array.
-	disabledSites[disabledSites.length] = window.location.hostname;
-	
-	unloadStudyBar(false);
 }
 
 // <Name> unloadStudyBar
@@ -1147,9 +1221,7 @@ window.unloadStudyBar = function(all){
 		//Remove last
 		$('#sb-jquery').remove();
 	} else {
-		window.setTimeout(GM_setValue, 0, "blocked", disabledSites);
 		if(all == true) window.setTimeout(GM_setValue, 0, "autoload", false);
-		console.log(disabledSites);
 	}
 	
 	// Remove the divs for StudyBar from the page.
@@ -1158,8 +1230,6 @@ window.unloadStudyBar = function(all){
 	$('#sbar').remove();
 	$('#sBarCSS').remove();
 	$('.tipsy').remove();
-	
-	document.body.style.fontSize = originalPageSettings.fontsize;
 }
 
 window.studybarHelp = function(){
@@ -1280,12 +1350,10 @@ window.utf8_encode = function(string) {
 
 		if (c < 128) {
 			utftext += String.fromCharCode(c);
-		}
-		else if((c > 127) && (c < 2048)) {
+		} else if((c > 127) && (c < 2048)) {
 			utftext += String.fromCharCode((c >> 6) | 192);
 			utftext += String.fromCharCode((c & 63) | 128);
-		}
-		else {
+		} else {
 			utftext += String.fromCharCode((c >> 12) | 224);
 			utftext += String.fromCharCode(((c >> 6) & 63) | 128);
 			utftext += String.fromCharCode((c & 63) | 128);
@@ -1417,7 +1485,9 @@ if (window == window.top) {
 		
 		// Attach jQuery, our custom button class and the greasemonkey compatibility functions.
 		attachJS( 'http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js', 'sb-jquery' );
+		// Our button class.
 		attachJS( settings.baseURL + 'button.class.js', 'sb-buttons' );
+		// Opera Greasemonkey extensions for Userscripts.
 		if(identifyBrowser() == 'Opera') attachJS( settings.baseURL + 'gm-compat.js', 'sb-gmcompat' );
 		
 		startProcess();
@@ -1434,15 +1504,7 @@ if (window == window.top) {
 		
 		//console.log(disabledSites);
 		
-		//var thisIsBlocked = false;
-		
 		jQCopyCSS();
-		
-		/*if(disabledSites.length > 0){
-			for (var i=0; i<disabledSites.length; i++ ){
-				if(disabledSites[i] == window.location.hostname) thisIsBlocked = true;
-			}
-		}*/
 	
 		if( autoLoadValue == true ) {
 			$(document).ready(function(){
