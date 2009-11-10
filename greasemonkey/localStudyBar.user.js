@@ -20,7 +20,7 @@
 // ==UserScript==
 // @name          StudyBar
 // @namespace     http://users.ecs.soton.ac.uk/scs/
-// @description   Accessibility toolbar
+// @description   StudyBar cross-platform, cross-browser Accessibility toolbar
 // @include       *
 // @require       http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js
 // @require       http://access.ecs.soton.ac.uk/seb/StudyBar/spell/core.js
@@ -29,7 +29,7 @@
 // @require       http://access.ecs.soton.ac.uk/seb/StudyBar/button.class.js
 // ==/UserScript==
 
-var versionString = "0.7.781";
+var versionString = "0.7.982";
 var buildStatus = "Public Preview";
 var relChannel = "public";
 
@@ -37,7 +37,7 @@ var settings = {
 				stylesheetURL: "presentation/style.css",
 				baseURL: "http://access.ecs.soton.ac.uk/seb/StudyBar/",
 				ttsSplitChunkSize: 700,
-				invoked: "false"
+				invoked: false
 				};
 
 
@@ -68,10 +68,10 @@ var toolbarItems = {
 		},
 		CSS: { id: 'changecss', ico: 'palette.png', act: 'changeColours(0)', tip: 'Change Styles', clickEnabled: true, 
 				dialogs: { 
-					colourDialog: "<h2>Change Colour settings</h2> <div class=\"sbarDialogButton\"> <a id=\"sbColourChange\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Change StudyBar Colour</a></div> <div class=\"sbarDialogButton\"><a id=\"sbChangeSiteColours\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Change Site Colours</a></div> <div class=\"sbarDialogButton\"><a id=\"sbAttachCSSStyle\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Premade page styles</a></div>",
-					sbColourDialog: "<h2>Change StudyBar Colour</h2> <label for=\"sbbackgroundcolour\">Background Colour: </label><input type=\"text\" name=\"sbbackgroundcolour\" id=\"sbbackgroundcolour\"> <a id=\"sbSetColour\" href=\"#s-b-c\"><img src=\"" + settings.baseURL + "/presentation/images/accept.png \" /> Set</a> <br /> <a onclick=\"document.getElementById('sbbackgroundcolour').value = 'black';\">Black</a> <a onclick=\"document.getElementById('sbbackgroundcolour').value = 'white';\">White</a> <a onclick=\"document.getElementById('sbbackgroundcolour').value = 'grey';\">Grey</a> <br /> <div class=\"sbarDialogButton\"><a id=\"sbRandomColour\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Random</a></div> <div class=\"sbarDialogButton\"> <a id=\"sbColourReset\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Reset to Default</a></div>",
-					sbSiteColours: "<h2>Change this site's colours</h2> <label for=\"sbbackgroundcolour\" style=\"display:block\">Background Colour: </label><input type=\"text\" name=\"sbpagebackgroundcolour\" id=\"sbpagebackgroundcolour\"><br /> <label for=\"sbtextcolour\" style=\"display:block\">Text Colour: </label><input type=\"text\" name=\"sbtextcolour\" id=\"sbtextcolour\"><br /><label for=\"sblinkcolour\" style=\"display:block\">Link Colour: </label><input type=\"text\" name=\"sblinkcolour\" id=\"sblinkcolour\"> <div class=\"sbarDialogButton\"><a id=\"applyPageColours\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Apply</a></div>",
-					sbAttachCSS: "<h2>Premade page styles</h2><div class=\"sbarDialogButton\"><a id=\"sbApplyCSS-wb\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Black on White</a></div> <div class=\"sbarDialogButton\" href=\"#s-b-c\"><a id=\"sbApplyCSS-wbw\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> White on Black</a></div> <div class=\"sbarDialogButton\"><a id=\"sbApplyCSS-yb\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Yellow on Black</a></div>"
+					colourDialog: "<h2>Change colour settings</h2> <div class=\"sbarDialogButton\"> <a id=\"sbColourChange\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Change StudyBar colour</a></div> <div class=\"sbarDialogButton\"><a id=\"sbChangeSiteColours\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Change text and link colours</a></div> <div class=\"sbarDialogButton\"><a id=\"sbAttachCSSStyle\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Change page style</a></div>",
+					sbColourDialog: "<h2>Change StudyBar colour</h2> <label for=\"sbbackgroundcolour\">Background Colour: </label><input type=\"text\" name=\"sbbackgroundcolour\" id=\"sbbackgroundcolour\"> <a id=\"sbSetColour\" href=\"#s-b-c\"><img src=\"" + settings.baseURL + "/presentation/images/accept.png \" /> Set</a> <br /> <div id=\"cp-container\"><a class=\"sb-cp-box\" href=\"#s-b-c\" onclick=\"document.getElementById('sbbackgroundcolour').value = 'black';\">Black</a> <a class=\"sb-cp-box\" href=\"#s-b-c\" onclick=\"document.getElementById('sbbackgroundcolour').value = 'white';\">White</a> <a class=\"sb-cp-box\" href=\"#s-b-c\" onclick=\"document.getElementById('sbbackgroundcolour').value = 'grey';\">Grey</a></div> <br /> <div class=\"sbarDialogButton\"><a id=\"sbRandomColour\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Random</a></div> <div class=\"sbarDialogButton\"> <a id=\"sbColourReset\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Reset to Default</a></div>",
+					sbSiteColours: "<h2>Change text and link colours</h2> <label for=\"sbtextcolour\" style=\"display:block\">Text Colour: </label><input type=\"text\" name=\"sbtextcolour\" id=\"sbtextcolour\"><br /><label for=\"sblinkcolour\" style=\"display:block\">Link Colour: </label><input type=\"text\" name=\"sblinkcolour\" id=\"sblinkcolour\"> <div class=\"sbarDialogButton\"><a id=\"applyPageColours\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Apply</a></div>",
+					sbAttachCSS: "<h2>Change page style</h2><div class=\"sbarDialogButton\"><a id=\"sbApplyCSS-wb\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Black on White</a></div> <div class=\"sbarDialogButton\" href=\"#s-b-c\"><a id=\"sbApplyCSS-wbw\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> White on Black</a></div> <div class=\"sbarDialogButton\"><a id=\"sbApplyCSS-yb\" href=\"#s-b-c\"> <img src=\"" + settings.baseURL + "presentation/images/dialog/arrow.png\" /> Yellow on Black</a></div>"
 				} 
 		},
 		resetPage: { id: 'resetPage', ico: 'arrow-curve-180-left.png', act: 'resetPage()', tip: 'Reset page', styleClass: ' fright', clickEnabled: true },
@@ -84,8 +84,6 @@ var sysDialog = {
 	aboutBox: "<h2>About StudyBar</h2>Version " + versionString + " \"" + buildStatus + "\" (" + relChannel + " release channel)<br /><div id=\"SBversionLatest\" style=\"margin-top:5px;\"><img src=\"" + settings.baseURL + "presentation/images/clock.png\" align=\"left\" style=\"margin-right:5px;\"/> Checking for updates...</div><br /><p style=\"line-height:120%\">Created by <a href=\"http://ecs.soton.ac.uk/people/mw/\">Mike Wald</a> and <a href=\"http://ecs.soton.ac.uk/people/scs/\">Sebastian Skuse</a>.<br />Learning Societies Lab<br /> &copy; University of Southampton 2009.<br />Fugue Icons &copy; <a href=\"http://www.pinvoke.com/\">pinvoke</a> under Creative Commons licence, Dictionary &copy; <a href=\"http://en.wiktionary.org/\">Wiktionary</a> under Creative Commons licence.<br /></p>"
 
 };
-		
-var buttons = {};
 
 var XHRMethod;
 var rteSpellTimer;
@@ -97,7 +95,7 @@ var head = document.getElementsByTagName('head')[0];
 // <ToDo> Nothing.
 
 window.loadStudyBar = function(){
-	if(settings.invoked == "false"){
+	if(settings.invoked == false){
 		doc = document;
 		
 		// Set the method of XHR that we're going to use.
@@ -117,26 +115,27 @@ window.loadStudyBar = function(){
 		// Add items to the toolbar.
 		populateBar();
 		
-		if( (typeof GM_setValue) == 'undefined' ) {
-		
-		} else {
+		if( (typeof GM_setValue) != 'undefined' ) {
 			// Set studybar to load next time we load a page.
 			GM_setValue('autoload', true);
 		}
+		
 		$("#sbarlogo").bind("click", function(e){ 
 			jQuery.facebox( sysDialog.aboutBox + "<div style=\"font-size:10px\">SpellCheck Client v" + jQuery.sb_spellVersion + ", fbox v" + jQuery.sb_faceboxVersion + "</div>" );
 			setTimeout(function(){ checkUpdate(); }, 500);
 		});
 		
-		if (identifyBrowser() == 'IE') { // IE
+		if ( isIE6() ) { // IE6
 			$('#sbarGhost').css('height', '1px');
 			$('#sbarGhost').remove();
 		}
 		
-		$('#sbarGhost').empty();
+		$('#sbarGhost').html("&nbsp;");
+		
+		// Any sites that have compatibility issues, issue any fixes we know about.
 		siteFixes();
 	
-		settings.invoked = "true";
+		settings.invoked = true;
 	}
 }
 
@@ -170,6 +169,10 @@ window.identifyBrowser = function(){
 			return navigator.appName;
 		}	
 	}	
+}
+
+window.isIE6 = function(){
+	return /MSIE 6/i.test(navigator.userAgent);
 }
 
 window.attachJS = function(url, id){
@@ -286,7 +289,7 @@ window.resizeText = function(multiplier) {
 	var newVal = parseFloat(current + mult);
 
 	//alert(current + "+" + mult + "=" + newVal);
-	$('body').css('font-size', newVal + "px" );
+	$('body, p:not-empty, div:not-empty').css('font-size', newVal + "px" );
 }
 
 
@@ -446,8 +449,7 @@ window.ttsJobSent = function(response){
 		var ro = eval("(" + response.responseText + ")");
 	} else {
 		var ro = response;
-	}
-	
+	}	
 	
 	if(ro.status == "encoding" && ro.status != "failure"){
 		if(identifyBrowser() == "FF"){
@@ -730,11 +732,7 @@ window.changeColours = function(level){
 	if(level == 2){
 		// Site colours
 		jQuery.facebox.changeFaceboxContent( toolbarItems.CSS.dialogs.sbSiteColours );
-		mbEventListener('applyPageColours', "click", function(e){ 
-			if( $('#sbpagebackgroundcolour').val() != "undefined"){
-				document.body.style.backgroundColor = $('#sbpagebackgroundcolour').val();
-			}
-			
+		mbEventListener('applyPageColours', "click", function(e){ 			
 			if( $('#sbtextcolour').val() != "undefined" ){
 				$('body').css('color', $('#sbtextcolour').val());
 			}
@@ -763,7 +761,7 @@ window.changeColours = function(level){
 		
 		});
 		
-		$("#sbpagebackgroundcolour").focus();
+		$("#sbtextcolour").focus();
 		
 	}
 	if(level == 3){
@@ -779,7 +777,7 @@ window.changeColours = function(level){
 			//CSStoInline("#sbar");
 			$(document).trigger('close.facebox');
 			removeCSS();
-			attachCSS(settings.baseURL + "presentation/stylesheets/highvis-wb.css", "highvis-wb");
+			attachCSS(settings.baseURL + "presentation/stylesheets/high-wb.css", "highvis-wb");
 			
 		});
 		
@@ -1030,7 +1028,6 @@ window.referencesDialog = function(){
 	
 	if( url.match("wiki") != null ) alert("Warning: This source may not be suitable for academic writing.");
 
-	
 	if( url.match("news") != null){
 		// This may be a news site.
 		options += "<option selected=\"selected\">News Article</option>";	
@@ -1199,7 +1196,10 @@ window.scanForReferenceMaterial = function(type){
 // Dialog for closing the bar.
 window.unloadOptions = function(){
 	jQuery.facebox(sysDialog.closeDialog);
-	mbEventListener('sbCloseAllSites', 'click', function(e){ unloadStudyBar(true) } );
+	mbEventListener('sbCloseAllSites', 'click', function(e){ 
+		$(document).trigger('close.facebox');
+		window.setTimeout(function(){ unloadStudyBar(true) }, 500);
+	} );
 }
 
 // <Name> unloadStudyBar
@@ -1225,11 +1225,15 @@ window.unloadStudyBar = function(all){
 	}
 	
 	// Remove the divs for StudyBar from the page.
-	$('#facebox').remove();
+	
+	//$('#facebox').remove();
+	//$('#facebox_overlay').remove();
 	$('#sbarGhost').remove();
 	$('#sbar').remove();
-	$('#sBarCSS').remove();
+	//$('#sBarCSS').remove();
 	$('.tipsy').remove();
+	
+	settings.invoked = false;
 }
 
 window.studybarHelp = function(){
@@ -1391,58 +1395,12 @@ window.setXHRMethod = function(){
 	}
 }
 
-// Start the loading process. We need jQuery to be loaded before we can do anything else, so check to see if its loaded. If its not, wait another 100ms and try again. Otherwise, load jQuery extensions and then studybar itself.
-window.startProcess = function(){
-	if ( typeof(jQuery) == 'undefined' ) {
-		setTimeout('startProcess()', 100);
+function isLoaded(){
+	if(document.getElementById('sbar') != null){
+		return true;
 	} else {
-		loadJQExtensions();
-		jQCopyCSS();
-		
-		bootstrap();
+		return false;
 	}
-
-}
-
-function jQCopyCSS(){
-		// jQuery by default doesnt support returning all the attributes..
-		jQuery.fn.css2 = jQuery.fn.css;
-		jQuery.fn.css = function() {
-		    if (arguments.length) return jQuery.fn.css2.apply(this, arguments);
-		    
-		    var attr = ['font-family','font-size','font-weight','font-style','color',
-		        'text-transform','text-decoration','letter-spacing','word-spacing',
-		        'line-height','text-align','vertical-align','background-color',
-		        'background-image','background-repeat','background-position',
-		        'background-attachment','opacity','width','height','top','right','bottom',
-		        'left','margin-top','margin-right','margin-bottom','margin-left',
-		        'padding-top','padding-right','padding-bottom','padding-left',
-		        'border-top-width','border-right-width','border-bottom-width',
-		        'border-left-width','border-top-color','border-right-color',
-		        'border-bottom-color','border-left-color','border-top-style',
-		        'border-right-style','border-bottom-style','border-left-style','position',
-		        'display','visibility','z-index','overflow-x','overflow-y','white-space',
-		        'clip','float','clear','cursor','list-style-image','list-style-position',
-		        'list-style-type','marker-offset'];
-		        
-		    var len = attr.length, obj = {};
-
-			var tmpJson = "";
-
-		    for (var i = 0; i < len; i++){ 
-		    	var tmpVal = jQuery.fn.css2.call(this, attr[i]);
-		    	
-		    	if(tmpVal != 'undefined' && tmpVal != "0px" && tmpVal != "none" && tmpVal != "rgb(0, 0, 0)" && tmpVal != "0%" && tmpVal != "normal" && tmpVal != "auto"){
-		       		obj[attr[i]] = tmpVal;
-		       		//tmpJson += " '" + attr[i] + "' : '" + tmpVal + "',";
-		       		//console.log(attr[i] + ": " + tmpVal);
-		        }
-		    }
-		    
-		    //tmpJson = tmpJson.replace(/,$/, ' ');
-		    
-		    return obj;
-		}
 }
 
 // <Name> loadJQExtensions
@@ -1455,10 +1413,22 @@ window.loadJQExtensions = function(){
 	attachJS( settings.baseURL + 'jquery.facebox.js', 'sb-facebox' );
 }
 
-function bootstrap(){
+// Start the loading process. We need jQuery to be loaded before we can do anything else, so check to see if its loaded. If its not, wait another 100ms and try again. Otherwise, load jQuery extensions and then studybar itself.
+window.startProcess = function(){
+	if ( typeof(jQuery) == 'undefined' ) {
+		setTimeout('startProcess()', 100);
+	} else {
+		loadJQExtensions();
+		//jQCopyCSS();
+		
+		bootstrap();
+	}
+
+}
+
+function showLoader(){
 	// Attatch our new stylesheet.
 	attachCSS(settings.baseURL + settings.stylesheetURL, "sBarCSS");
-
 	// Create the div for the StudyBar ghost.
 	barGhost = document.createElement('div');
 	// Set the ID of the toolbar.
@@ -1467,51 +1437,66 @@ function bootstrap(){
 	
 	// Insert it as the first node in the body node.
 	document.body.insertBefore(barGhost, document.body.firstChild);
-	
+}
+
+function bootstrap(){
+	// We've loaded essential dependencies, start the actual loading procedure.
 	loadStudyBar();
 }
 
-///////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////////
+// Below is the loading code.
+///////////////////////////////////////////////////////////////////////////
 // Are we loading in an iframe?
 if (window == window.top) {
 
-	// Check to see if we can register a menu item in Greasemonkey. Note: This is only supported in Greasemonkey for Firefox.
-	if( (typeof GM_registerMenuCommand) == 'undefined') {
-		// No greasemonkey extensions. Load manually.
+	if( isLoaded() == false ){
+	
+		// Check to see if we can register a menu item in Greasemonkey. Note: This is only supported in Greasemonkey for Firefox.
+		if( (typeof GM_registerMenuCommand) == 'undefined') {
+			// No greasemonkey extensions. Load manually.
 
-		// IE? Change over our event listeners to its own format.
-		createIEaddEventListeners();
-		
-		// Attach jQuery, our custom button class and the greasemonkey compatibility functions.
-		attachJS( 'http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js', 'sb-jquery' );
-		// Our button class.
-		attachJS( settings.baseURL + 'button.class.js', 'sb-buttons' );
-		// Opera Greasemonkey extensions for Userscripts.
-		if(identifyBrowser() == 'Opera') attachJS( settings.baseURL + 'gm-compat.js', 'sb-gmcompat' );
-		
-		startProcess();
-	} else {
-		
-		// If the user had studybar open, reopen it again.
-		var autoLoadValue = GM_getValue('autoload', false);
-		
-		// Register the greasemonkey menu items.
-		GM_registerMenuCommand("Load StudyBar Toolbar", function(){ bootstrap(); });
-		
-		// Get the blocked sites list
-		disabledSites = GM_getValue('blocked', []);
-		
-		//console.log(disabledSites);
-		
-		jQCopyCSS();
+			// Show the sBarGhost loader.
+			showLoader();
 	
-		if( autoLoadValue == true ) {
-			$(document).ready(function(){
-				bootstrap();
+			// IE? Change over our event listeners to its own format.
+			createIEaddEventListeners();
+			
+			// Attach jQuery, our custom button class and the greasemonkey compatibility functions.
+			attachJS( 'http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js', 'sb-jquery' );
+			// Our button class.
+			attachJS( settings.baseURL + 'button.class.js', 'sb-buttons' );
+			// Opera Greasemonkey extensions for Userscripts.
+			if(identifyBrowser() == 'Opera') attachJS( settings.baseURL + 'gm-compat.js', 'sb-gmcompat' );
+			
+			startProcess();
+		} else {
+			
+			// If the user had studybar open, reopen it again.
+			var autoLoadValue = GM_getValue('autoload', false);
+
+			if( autoLoadValue == true ) {
+				// Show the sBarGhost loader.
+				showLoader();
+				
+				$(document).ready(function(){
+					bootstrap();
+				});
+			}
+			
+			// Register the greasemonkey menu items.
+			GM_registerMenuCommand("Load StudyBar Toolbar", function(){ 
+				// Show the sBarGhost loader.
+				showLoader();
+				// Load StudyBar
+				$(document).ready(function(){
+					bootstrap();
+				});
 			});
+		
+		
 		}
-	
 	}
 	
 }
